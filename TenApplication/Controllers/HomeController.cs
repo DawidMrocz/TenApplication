@@ -28,6 +28,12 @@ namespace TenApplication.Controllers
             return View(job);
         }
 
+        public async Task<ActionResult<Job>> Details2(int id)
+        {
+            Job? job = await _unitOfWork.Jobs.GetById(j => j.JobId == id);
+            return View(job);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
