@@ -21,7 +21,7 @@ namespace TenApplication.Controllers
             IEnumerable<Job>? jobs = await _unitOfWork.Jobs.GetAll();
             return View(jobs);
         }
-        // DODALEM KOMENTARZ 
+   
         public async Task<ActionResult<Job>> Details(int id)
         {
             Job? job = await _unitOfWork.Jobs.GetById(j => j.JobId == id);
