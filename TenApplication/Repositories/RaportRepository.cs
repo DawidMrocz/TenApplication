@@ -25,9 +25,17 @@ namespace TenApplication.Repositories
         public async Task<Raport> GetById(int CatId)
         {
             Raport? result = await _applicationDbContext.Raports
+                .AsSplitQuery()
                 .Include(r => r.RaportRecords)
-                    .ThenInclude(i => i.InboxItem)
-                    .Select(r => r)
+                    .ThenInclude(i => i.InboxItem.Job)
+                .Include(r => r.RaportRecords)
+                    .ThenInclude(i => i.InboxItem.Inbox.User)
+                    .Select(r => new RaportDto(){
+                        RaportId = r.RaportId
+                        RaportCreateDate { get; set; }
+                        AllRaportHours { get; set; }
+                        RaportRecords { get; set; }
+                    })
                     .Select(i => new InboxItemDto(){
                         InboxItemId=
                         Components=
