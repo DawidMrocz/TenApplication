@@ -8,7 +8,7 @@ namespace TenApplication.Repositories
     {
         public Task<InboxDto> GetInbox(int userId);
 
-        public Task CreateInboxItem(int jobId, int inboxId);
+        public Task CreateInboxItem(int jobId);
         public Task UpdateInboxItem(UpdateInboxItemDto inboxItem, int inboxItemId);
         public Task DeleteInboxItem(int inboxItem);
     }

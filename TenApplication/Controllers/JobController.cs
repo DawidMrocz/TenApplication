@@ -147,5 +147,14 @@ namespace TenApplication.Controllers
                 return BadRequest("Server error!");
             }
         }
+
+        [HttpGet]
+        [IdProvidedValidation]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult<InboxItemDTO>> CreateInboxItem([FromRoute] int jobId)
+        {
+            await _inboxRepository.CreateInboxItem(jobId);
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

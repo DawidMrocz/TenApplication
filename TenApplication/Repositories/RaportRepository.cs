@@ -19,8 +19,7 @@ namespace TenApplication.Repositories
                 .Select(r => r.RaportCreateDate)
                 .AsNoTracking()
                 .OrderBy(c => c.RaportCreateDate)
-                .ToListAsync();
-        }
+1        }
 
         public async Task<RaportDto> GetById(int CatId)
         {

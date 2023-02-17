@@ -114,6 +114,11 @@ namespace TenApplication.Repositories
 
                 if(userCatRecord is null){
                     userCat.CatRecords.AddAsync(newCatRecord);
+                    RaportRecord raportRecord = new(){
+                        RaportCreateDate = entryDate
+                        InboxItemId = inboxItemId    
+                    }
+                    await _applicationDbContext.RaportRecords.AddAsync(raportRecord);     
                 }
                 else {
                     userCatRecord.Hours = hours;      
