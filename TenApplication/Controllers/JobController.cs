@@ -28,8 +28,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpGet(Name = "jobs")]
-        [ProducesResponseType(typeof(PaginatedList<JobDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<PaginatedList<JobDto>>> Get([FromQuery]QueryParams queryParams)
         {          
             try
@@ -52,19 +50,16 @@ namespace TenApplication.Controllers
 
         [HttpGet(Name = "job")]
         [Route("/job/{id}")]
-        [ProducesResponseType(typeof(JobDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [IdProvidedValidation]
-        public async Task<ActionResult<PaginatedList<JobDto>>> GetById([FromRoute]int? id)
+        [IdProvidedValidation(IdName = "jobId")]
+        public async Task<ActionResult<PaginatedList<JobDto>>> GetById([FromRoute]int? jobId)
         {
             try
             {
-                JobDto? job = await _cache.GetRecordAsync<JobDto>($"job_{id}");
+                JobDto? job = await _cache.GetRecordAsync<JobDto>($"job_{jobId}");
                 if (job is null)
                 {
-                    await _jobRepository.GetById(id);
-                    await _cache.SetRecordAsync($"job_{id}", job);
+                    await _jobRepository.GetById(jobId);
+                    await _cache.SetRecordAsync($"job_{jobId}", job);
                 } 
                 if (job is null) return NotFound("job NOT FOUND");
                 return Ok(job);
@@ -78,10 +73,7 @@ namespace TenApplication.Controllers
 
         [HttpPost(Name = "Create")]
         [ValidationFilter(DTOName = "job")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> Create([FromBody] Job job)
+        public async Task<IActionResult> Create([FromBody][Bind(include:"Name,Surname,BirthDate,Gender,CarLicense")] Job job)
         {
             try
             {
@@ -99,17 +91,14 @@ namespace TenApplication.Controllers
 
         [HttpPut(Name = "Update")]
         [Route("/job/{id}")]
-        [IdProvidedValidation]
+        [ValidateAntiForgeryToken]
         [ValidationFilter(DTOName="job")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> Update([FromBody] Job job, [FromRoute]int? id)
+        public async Task<IActionResult> Update([FromBody][Bind(include:"Name,Surname,BirthDate,Gender,CarLicense")] Job job)
         {
             try
             {
                     await _jobRepository.Update(job);
-                    await _cache.DeleteRecordAsync<JobDto>($"job_{id}");
+                    await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
                     await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
                     return Ok();
             }
@@ -125,16 +114,13 @@ namespace TenApplication.Controllers
 
         [HttpDelete(Name = "Delete")]
         [Route("/job/{id}")]
-        [IdProvidedValidation]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        [IdProvidedValidation(IdName = "jobId")]
+        public async Task<IActionResult> Delete([FromRoute] int jobId)
         {
             try
             {
-                await _jobRepository.Delete(id);
-                await _cache.DeleteRecordAsync<JobDto>($"job_{id}");
+                await _jobRepository.Delete(jobId);
+                await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
                 await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
                 return Ok();
             }
@@ -149,11 +135,11 @@ namespace TenApplication.Controllers
         }
 
         [HttpGet]
-        [IdProvidedValidation]
-        [ValidateAntiForgeryToken]
+        [IdProvidedValidation(IdName = "jobId")]
         public async Task<ActionResult<InboxItemDTO>> CreateInboxItem([FromRoute] int jobId)
         {
-            await _inboxRepository.CreateInboxItem(jobId);
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value)
+            await _inboxRepository.CreateInboxItem(jobId,authenticatedId);
             return RedirectToAction("Index", "Home");
         }
     }

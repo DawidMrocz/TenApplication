@@ -21,10 +21,7 @@ namespace TenApplication.Controllers
             _DesignerRepository = DesignerRepository ?? throw new ArgumentNullException(nameof(DesignerRepository));
         }
 
-
         [HttpGet]
-        [ProducesResponseType(typeof(DesignerDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<DesignerDto>> Profile()
         {
             try
@@ -46,8 +43,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<bool>> DeleteDesigner()
         {
             try
@@ -62,8 +57,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpPut]
-        [ProducesResponseType(typeof(Designer), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Designer>> UpdateDesigner([FromBody] UpdateDto updateDesigner)
         {
             var DesignerId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);

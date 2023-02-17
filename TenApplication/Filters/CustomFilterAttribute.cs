@@ -7,10 +7,10 @@ namespace TenApplication.ActionFilters
 {
     public class IdProvidedValidationAttribute : ActionFilterAttribute, IActionFilter
     {
+        public required string IdName { get; set; }
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            bool exist = context.ActionArguments.ContainsKey("id");
-            if (context.ActionArguments["id"] != null && !exist)
+            if (context.ActionArguments[IdName] is null)
             {
                 context.Result = new BadRequestObjectResult("ID not found");
                 return;
