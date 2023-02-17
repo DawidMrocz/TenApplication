@@ -13,6 +13,7 @@ namespace TenApplication.Models
         public DateTime Day { get; set; }
 
         //RELATIONS
+        public List<CatRecordCell>? CatRecordCells { get; set; }
         public int CatId { get; set; }
         public Cat? Cat { get; set; }
         public int InboxItemId { get; set; }
