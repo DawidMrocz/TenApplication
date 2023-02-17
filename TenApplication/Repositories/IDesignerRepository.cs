@@ -15,7 +15,6 @@ namespace TenApplication.Repositories
         public Task<bool> ChangePassword(int DesignerId, string oldPassword, string newPassword, string newPasswordRepeat);
         public Task<bool> ChangeRole(int DesignerId, UserRole role);
 
-
         public Task<Designer> CreateDesigner(RegisterDto command);
         public Task<bool> DeleteDesigner(int DesignerId);
         public Task<Designer> UpdateDesigner(UpdateDto command, int DesignerId);

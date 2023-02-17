@@ -13,7 +13,7 @@ namespace TenApplication.Data
         public DbSet<InboxItem> InboxItems { get; set; }
         public DbSet<Raport> Raports { get; set; }
         public DbSet<RaportRecord> RaportRecords { get; set; }
-        public DbSet<Cat> Cat { get; set; }
+        public DbSet<Cat> Cats { get; set; }
         public DbSet<CatRecord> CatRecords { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

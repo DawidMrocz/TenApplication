@@ -87,29 +87,56 @@ namespace TenApplication.Repositories
         }
 
         public async Task AddCatRecord(int inboxItemId, int userId, DateTime entryDate, double hours)
-        {
-            Cat? userCat = await _applicationDbContext.Cat.FirstOrDefaultAsync(c => c.UserId == userId)
+        {           
+            Cat? userCat = await _applicationDbContext.Cats
+            .Include(rec => rec.CatRecords)
+            .FirstOrDefaultAsync(
+                c => c.UserId == userId && 
+                c.CatRecords.Any(rec => rec.Created == entryDate));
+
+            CatRecord newCatRecord = new()
+             { 
+                CellHours = hours 
+                Created = entryDate    
+                InboxItemId = inboxItemId   
+             };
 
             if(userCat is null) {
                 userCat = new Cat(){
                     UserId = userId                
-                    CatRecords = new List<CatRecord>();
+                    CatRecords = CatRecords.Add(newCatRecord);
                 }
-                await _applicationDbContext.Cat.AddAsync(userCat);
-            };
+                await _applicationDbContext.Cats.AddAsync(userCat);                    
+            }
+            else
+            {              
+                CatRecord? userCatRecord = await _applicationDbContext.CatRecords.FirstOrDefaultAsync(rec => rec.CatId == userCat.CatId && rec.Created == entryDate);
 
-            CatRecord newCatRecord = new()
-            {
-                CellHours = hours 
-                Created = entryDate    
-                InboxItemId = inboxItemId    
+                if(userCatRecord is null){
+                    userCat.CatRecords.AddAsync(newCatRecord);
+                }
+                else {
+                    userCatRecord.Hours = hours;      
+                }                
             };
-
-            await userCat.AddAsync(newCatRecord);
-            
-            await _applicationDbContext.CatRecords.AddAsync(newCatRecord);
             await _applicationDbContext.SaveChangesAsync();
         }
 
+        public async Task DeleteCatRecord(int inboxItemId,int catRecordId, int userId, DateTime entryDate)
+        {    
+            Cat? userCat = await _applicationDbContext.Cats
+            .Include(rec => rec.CatRecords)
+            .FirstOrDefaultAsync(
+                c => c.UserId == userId && 
+                c.CatRecords.Any(rec => rec.Created == entryDate));
+
+            CatRecord? recordToDelete = userCat.CatRecords.FirstOrDefaultAsync(r => r.InboxItemId == inboxItemId && r.Created = entryDate)
+
+            await _applicationDbContext.CatRecords.Remove(recordToDelete)
+
+            if(userCat.CatRecords.Where(r => r.InboxItemId == inboxItemId).Count() == 0){
+                await _applicationDbContext.RaportRecords.Where(p => p.InboxItemId== inboxItemId).ExecuteDeleteAsync();
+            }
+        }
     }
 }

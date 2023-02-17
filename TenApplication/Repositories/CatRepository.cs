@@ -15,7 +15,7 @@ namespace TenApplication.Repositories
 
         public async Task<List<Cat>> GetAll(int userId)
         {
-            return await _applicationDbContext.Cat
+            return await _applicationDbContext.Cats
                 .Include(rec => rec.CatRecords.Select(d => d.Created))
                 .Where(u => u.UserId == userId)
                 .Select(c => c.Created)
@@ -26,7 +26,7 @@ namespace TenApplication.Repositories
 
         public async Task<CatDto> GetById(int catId)
         {
-            return await _applicationDbContext.Cat
+            return await _applicationDbContext.Cats
                 .AsSplitQuery()
                 .Include(d => d.Designer)
                 .Include(rec => rec.CatRecords)
@@ -49,22 +49,6 @@ namespace TenApplication.Repositories
                 })
                 .AsNoTracking()
                 .FirtsOrDefaultAsync();
-        }
-
-        
-
-        public async Task DeleteCatRecord(int catRecordId)
-        {
-            await _applicationDbContext.CatRecords.Where(p => p.CatRecordId == catRecordId).ExecuteDeleteAsync();
-        }
-
-        public async Task UpdateCatRecord(UpdateCatRecordDto catRecord)
-        {
-            await _applicationDbContext.CatRecords
-                .Where(p => p.Day == catRecord.CatRecordCreated && p.CatId == catRecord.CatId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(b => b.DayHours, b => catRecord.CatRecordHours)
-                    );
         }
     }
 }
