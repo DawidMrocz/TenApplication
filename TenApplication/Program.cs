@@ -1,9 +1,27 @@
+using TenApplication.Data;
 using TenApplication.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                        providerOptions => { providerOptions.EnableRetryOnFailure(); });
+    options.LogTo(Console.WriteLine);
+    options.EnableDetailedErrors();
+    options.EnableSensitiveDataLogging();
+});
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance";
+});
+
 builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<ICatRepository, CatRepository>();
+builder.Services.AddScoped<IDesignerRepository, DesignerRepository>();
+builder.Services.AddScoped<IInboxRepository, InboxRepository>();
 
 builder.Services.AddControllersWithViews();
 

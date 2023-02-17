@@ -21,7 +21,7 @@ namespace TenApplication.Helpers
             object? value, ValidationContext validationContext)
         {
             //var user = (User)validationContext.ObjectInstance;
-            string inputValue = value.ToString();
+            string? inputValue = value!.ToString();
 
             if (inputValue is null) return new ValidationResult(GetErrorMessage3());
 

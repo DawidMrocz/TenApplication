@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 
 namespace TenApplication.Models
 {
     public class InboxItem
     {
-        public Guid InboxItemId { get; set; }
+        public int InboxItemId { get; set; }
         [Range(0, 1000,ErrorMessage ="Value out of range!")]
         public double Hours { get; set; } = 0;
         [Range(0, 1000, ErrorMessage = "Value out of range!")]
@@ -13,9 +14,12 @@ namespace TenApplication.Models
         public int DrawingsComponents { get; set; } = 0;
         [Range(0, 1000, ErrorMessage = "Value out of range!")]
         public int DrawingsAssembly { get; set; } = 0;
-        public int JobId { get; set; }
+
+        //RELATIONS
+        public int? JobId { get; set; }
         public Job? Job { get; set; }
-        public Guid? UserId { get; set; }
-        public User? User { get; set; }
+        public int? InboxId { get; set; }
+        public Inbox? Inbox { get; set; }
+        public List<CatRecord> CatRecords { get; set; } = new List<CatRecord>();
     }
 }

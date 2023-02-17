@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace TenApplication.Models
 {
@@ -25,20 +27,18 @@ namespace TenApplication.Models
         public int JobId { get; set; }
         [StringLength(100)]
         public string? JobDescription { get; set; }
-        public required TaskType Type { get; set; }
+        public required TaskType TaskType { get; set; }
         public required Software Software { get; set; }
         [Url(ErrorMessage ="Input must be url string!")]
         public string? Link { get; set; }
         public Guid EngineerId { get; set; }
         public Engineer? Engineer { get; set; }
-        public Guid UserId { get; set; }
-        public User? User { get; set; }
         [Required]
         [Range(3000000, 4000000, ErrorMessage = "Ecm number out of range!")]
         public required int Ecm { get; set; }
         [Required]
         [Range(1,100,ErrorMessage = "Task number out of range!")]
-        public int? Gpdm { get; set; }
+        public int Gpdm { get; set; }
         public required Region? Region { get; set; }
         public string? ProjectNumber { get; set; }
         public Client? Client { get; set; }
@@ -54,8 +54,9 @@ namespace TenApplication.Models
         public DateTime? Started { get; set; }
         [DataType(DataType.Date)]
         public DateTime? Finished { get; set; }
-        [DataType(DataType.Date)]
-        public List<InboxItem>? InboxItems { get; set; }
+
+        //RELATIONS
+        public List<InboxItem> InboxItems { get; set; } = new List<InboxItem>();
         public string SapText
         {
             get
@@ -67,11 +68,12 @@ namespace TenApplication.Models
         {
             get
             {
-                switch (Region)
+                Enum regionValue = Region!;
+                switch (regionValue!.ToString())
                 {
-                    case NA: return "RECEIVER OF NA"; break;
-                    case "CN": return "RECEIVER OF CN"; break;
-                    case "IN": return "RECEIVER OF IN"; break;
+                    case "NA": return "RECEIVER OF NA";
+                    case "CN": return "RECEIVER OF CN";
+                    case "IN": return "RECEIVER OF IN";
                     default: return "RECEIVER OF RYB";
                 }
             }

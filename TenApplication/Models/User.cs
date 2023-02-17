@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TenApplication.Helpers;
+﻿
+using System.ComponentModel.DataAnnotations;
 
 namespace TenApplication.Models
 {
@@ -25,13 +25,10 @@ namespace TenApplication.Models
     }
     public abstract class User
     {
-        public Guid UserId { get; set; }
-        [NameValidator(20)]
+        public int UserId { get; set; }
         public required string Name { get; set; }
-        [NameValidator(30)]
         public required string Surname { get; set; }
         [DataType(DataType.EmailAddress)]
-        [EmailValidator(50)]
         public required string Email { get; set; }
         public string? Phone { get; set; }
         [Required(ErrorMessage = "Pole CCtr nie może być puste!")]
@@ -42,8 +39,7 @@ namespace TenApplication.Models
             {
                 return $"{Name} {Surname}";
             }
-        }
-        public List<Job>? Jobs { get; set; } = new List<Job>();
+        }      
     }
 
     public class Designer : User, IValidatableObject
@@ -64,10 +60,10 @@ namespace TenApplication.Models
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public required DateTime TennecoStartDate { get; set; }
-        public List<InboxItem>? InboxItems { get; set; } = new List<InboxItem>();
-        public List<Cat>? Cats { get; set; } = new List<Cat>();
-        public List<Raport>? Raports { get; set; } = new List<Raport>();
+        public DateTime TennecoStartDate { get; set; }
+        public Inbox Inbox { get; set; } = null!;
+        public List<Cat> Cats { get; set; } = new List<Cat>();
+        public List<Raport> Raports { get; set; } = new List<Raport>();
         public double Experience
         {
             get
@@ -89,7 +85,6 @@ namespace TenApplication.Models
             }
         }
     }
-
     public class Engineer:User
     {
         public Client Client { get; set; }
