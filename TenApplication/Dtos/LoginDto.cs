@@ -1,4 +1,4 @@
-﻿namespace TenApplication.DTO
+﻿namespace TenApplication.Dtos
 {
     public class LoginDto
     {

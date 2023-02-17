@@ -11,7 +11,6 @@ namespace TenApplication.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Inbox> Inboxs { get; set; }
         public DbSet<InboxItem> InboxItems { get; set; }
-        public DbSet<Raport> Raports { get; set; }
         public DbSet<RaportRecord> RaportRecords { get; set; }
         public DbSet<Cat> Cats { get; set; }
         public DbSet<CatRecord> CatRecords { get; set; }

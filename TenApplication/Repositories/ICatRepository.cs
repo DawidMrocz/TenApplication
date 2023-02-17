@@ -1,14 +1,10 @@
-﻿using TenApplication.DTO;
-using TenApplication.DTO.CatDTO;
-using TenApplication.DTO.InboxDTO;
-using TenApplication.Dtos;
-using TenApplication.Models;
+﻿using TenApplication.Dtos.CatDTOModels;
 
 namespace TenApplication.Repositories
 {
     public interface ICatRepository
     {
-        public Task<List<Cat>> GetAll(int userId);
+        public Task<List<CatRecordDto>> GetAll(int userId);
         public Task<CatDto> GetById(int CatId);
     }
 }

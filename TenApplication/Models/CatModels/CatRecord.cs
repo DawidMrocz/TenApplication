@@ -1,5 +1,8 @@
 ﻿
 
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
 namespace TenApplication.Models
 {
     public class CatRecord

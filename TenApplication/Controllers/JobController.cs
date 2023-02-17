@@ -3,12 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using TenApplication.ActionFilters;
-using TenApplication.DTO;
 using TenApplication.Dtos;
 using TenApplication.Helpers;
 using TenApplication.Models;
 using TenApplication.Repositories;
-using System.Net;
+using TenApplication.Dtos.JobDTOModels;
+using TenApplication.Dtos.InboxDTO;
+using System.Security.Claims;
 
 namespace TenApplication.Controllers
 {
@@ -17,14 +18,16 @@ namespace TenApplication.Controllers
     public class JobController : ControllerBase
     {
         private readonly IJobRepository _jobRepository;
+        private readonly IInboxRepository _inboxRepository;
         private readonly ILogger<JobController> _logger;
         private readonly IDistributedCache _cache;
 
-        public JobController(ILogger<JobController> logger, IJobRepository jobRepository, IDistributedCache cache)
+        public JobController(ILogger<JobController> logger, IJobRepository jobRepository, IDistributedCache cache, IInboxRepository inboxRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jobRepository = jobRepository ?? throw new ArgumentNullException(nameof(jobRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+            _inboxRepository = inboxRepository ?? throw new ArgumentNullException(nameof(inboxRepository));
         }
 
         [HttpGet(Name = "jobs")]
@@ -98,7 +101,7 @@ namespace TenApplication.Controllers
             try
             {
                     await _jobRepository.Update(job);
-                    await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
+                    await _cache.DeleteRecordAsync<JobDto>($"job_{job.JobId}");
                     await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
                     return Ok();
             }
@@ -136,9 +139,9 @@ namespace TenApplication.Controllers
 
         [HttpGet]
         [IdProvidedValidation(IdName = "jobId")]
-        public async Task<ActionResult<InboxItemDTO>> CreateInboxItem([FromRoute] int jobId)
+        public async Task<ActionResult<InboxItemDto>> CreateInboxItem([FromRoute] int jobId)
         {
-            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value)
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
             await _inboxRepository.CreateInboxItem(jobId,authenticatedId);
             return RedirectToAction("Index", "Home");
         }

@@ -1,9 +1,8 @@
-﻿using TenApplication.DTO.DesignerDTO;
-using TenApplication.DTO.InboxDTO;
+﻿
 using TenApplication.Models;
 
 
-namespace TenApplication.Dtos
+namespace TenApplication.Dtos.JobDTOModels
 {
     public class JobDto
     {

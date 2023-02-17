@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TenApplication.Models;
 
-namespace TenApplication.DTO.CatDTO
+namespace TenApplication.Dtos.CatDTOModels
 {
     public class UpdateCatDto
     {

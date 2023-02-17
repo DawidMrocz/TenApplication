@@ -1,6 +1,6 @@
 ﻿using TenApplication.Models;
 
-namespace TenApplication.DTO.CatDTO
+namespace TenApplication.Dtos.CatDTOModels
 {
     public class UpdateCatRecordDto
     {

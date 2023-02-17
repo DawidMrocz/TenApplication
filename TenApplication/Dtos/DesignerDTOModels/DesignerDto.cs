@@ -2,9 +2,9 @@
 using TenApplication.Models;
 
 using System.ComponentModel.DataAnnotations;
-using TenApplication.DTO.InboxDTO;
+using TenApplication.Dtos.InboxDTO;
 
-namespace TenApplication.DTO.DesignerDTO
+namespace TenApplication.Dtos.DesignerDTOModels
 {
     public class DesignerDto
     {
@@ -21,7 +21,7 @@ namespace TenApplication.DTO.DesignerDTO
         public DateTime TennecoStartDate { get; set; }
         public List<InboxItemDto>? InboxItems { get; set; }
         public List<Cat>? Cats { get; set; }
-        public List<Raport>? Raports { get; set; }
+        public List<RaportRecord>? RaportRecords { get; set; }
         public string DisplayName
         {
             get

@@ -1,9 +1,8 @@
 ﻿
 
-using System.ComponentModel.DataAnnotations;
-using TenApplication.DTO.InboxDTO;
 
-namespace TenApplicationt.DTO.InboxDTO
+
+namespace TenApplication.Dtos.InboxDTO
 {
     public class InboxDto
     {

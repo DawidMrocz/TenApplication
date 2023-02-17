@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace TenApplication.DTO
+namespace TenApplication.Dtos
 {
     public class PaginatedList<T> : List<T>
     {

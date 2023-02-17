@@ -1,6 +1,6 @@
 ﻿using TenApplication.Models;
 
-namespace TenApplication.DTO
+namespace TenApplication.Dtos
 {
     public class CommentDto
     {

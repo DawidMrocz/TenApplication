@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
-using TenApplication.DTO.CatDTO;
+using TenApplication.Dtos.RaportDTOModels;
 using TenApplication.Models;
 
 namespace TenApplication.Repositories
 {
-    public class CatRepository:ICatRepository
+    public class RaportRepository : IRaportRepository
     {
         private readonly ApplicationDbContext _applicationDbContext;
         public RaportRepository(ApplicationDbContext applicationDbContext)
@@ -13,45 +13,48 @@ namespace TenApplication.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<List<Raport>> GetAll()
+        public async Task<List<RaportRecordDto>> GetAll()
         {
-            return await _applicationDbContext.Raports
-                .Select(r => r.RaportCreateDate)
-                .AsNoTracking()
+            List<RaportRecordDto>? records = await _applicationDbContext.RaportRecords
                 .OrderBy(c => c.RaportCreateDate)
-1        }
+                .AsNoTracking()
+                .Select(r => new RaportRecordDto()
+                {
+                    RaportCreateDate = r.RaportCreateDate
+                })             
+                .Distinct()             
+                .ToListAsync();
+            return records;
+1       }
 
-        public async Task<RaportDto> GetById(int CatId)
+        public async Task<RaportRecordDto> GetById(int CatId)
         {
-            await _applicationDbContext.Raports
-                .AsSplitQuery()
-                .Include(r => r.RaportRecords)
-                    .ThenInclude(i => i.InboxItem.Job)
-                .Include(r => r.RaportRecords)
-                    .ThenInclude(i => i.InboxItem.Inbox.User)
-                .Include(r => r.RaportRecords)
-                    .ThenInclude(i => i.InboxItem.CatRecords.Where(crec => crec.InboxItemId == ).Select(crec => crec.Hours))
-                    .Select(r => new RaportDto(){
-                        RaportId = r.RaportId
-                        RaportCreateDate = r.RaportCreateDate
-                        AllRaportHours = r.AllRaportHours
+            return await _applicationDbContext.RaportRecords
+                .Include(i => i.InboxItem)
+                    .ThenInclude(j => j.Job)
+                .Include(i => i.InboxItem)
+                    .ThenInclude(i => i.Inbox)
+                    .ThenInclude(d => d.Desinger)
+                    .Select(r => new RaportRecordDto(){
+                        RaportCreateDate = r.RaportCreateDate,
+                        RaportRecordHours = r.,
                         RaportRecords = r.RaportRecords.Select(rec => new RaportRecordDto(){
-                            RaportRecordId = rec.RaportRecordId
-                            RaportRecordHours = rec.RaportRecordHours
-                            Components = rec.InboxItem.Components
-                            DrawingsComponents = rec.InboxItem.DrawingsComponents
-                            DrawingsAssembly = rec.InboxItem.DrawingsAssembly
-                            Name = rec.InboxItem.Inbox.Designer.Name
-                            Surname = rec.InboxItem.Inbox.Designer.Surname
-                            Software = rec.InboxItem.Job.Software
-                            Ecm = rec.InboxItem.Job.Ecm
-                            Gpdm = rec.InboxItem.Job.Gpdm
-                            ProjectNumber = rec.InboxItem.Job.ProjectNumber
-                            Client = rec. InboxItem.Job.Client         
-                            DueDate = rec.InboxItem.Job.DueDate
-                            Started = rec.InboxItem.Job.Started
+                            RaportRecordId = rec.RaportRecordId,
+                            RaportRecordHours = rec.RaportRecordHours,
+                            Components = rec.InboxItem.Components,
+                            DrawingsComponents = rec.InboxItem.DrawingsComponents,
+                            DrawingsAssembly = rec.InboxItem.DrawingsAssembly,
+                            Name = rec.InboxItem.Inbox.Designer.Name,
+                            Surname = rec.InboxItem.Inbox.Designer.Surname,
+                            Software = rec.InboxItem.Job.Software,
+                            Ecm = rec.InboxItem.Job.Ecm,
+                            Gpdm = rec.InboxItem.Job.Gpdm,
+                            ProjectNumber = rec.InboxItem.Job.ProjectNumber,
+                            Client = rec. InboxItem.Job.Client,        
+                            DueDate = rec.InboxItem.Job.DueDate,
+                            Started = rec.InboxItem.Job.Started,
                             Finished = rec.InboxItem.Job.Finished
-                        }).ToListAsync()
+                        }).ToList()
                     });
         }
     }

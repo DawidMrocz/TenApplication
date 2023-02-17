@@ -1,6 +1,5 @@
 ﻿
-
-namespace TenApplication.DTO.InboxDTO
+namespace TenApplication.Dtos.InboxDTO
 {
     public class InboxItemDto
     {
