@@ -17,5 +17,6 @@ namespace TenApplication.DTO.InboxDTO
         public DateTime? DueDate { get; set; }
         public DateTime? Started { get; set; }
         public DateTime? Finished { get; set; }
+        public List<CatRecord> CatRecords { get; set; }
     }
 }

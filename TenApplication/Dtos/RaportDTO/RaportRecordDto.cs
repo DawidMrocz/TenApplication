@@ -12,8 +12,8 @@ namespace TenApplication.DTO.RaportDTO
         public int DrawingsAssembly { get; set; }
 
         //RELATIONS
-        public required string Name { get; set; }
-        public required string Surname { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
         public string DisplayName
         {
             get
@@ -22,15 +22,15 @@ namespace TenApplication.DTO.RaportDTO
             }
         }      
         
-        public required Software Software { get; set; }
-        public required int Ecm { get; set; }
+        public Software Software { get; set; }
+        public int Ecm { get; set; }
         public int Gpdm { get; set; }
         public string? ProjectNumber { get; set; }
         public Client? Client { get; set; }             
         public DateTime? DueDate { get; set; }
         public DateTime? Started { get; set; }
-        public DateTime? Finished { get; set; }
+        public DateTime? Finished { get; set; }  
 
-        
+        public double UserRecordHours { get; set; }  
     }
 }

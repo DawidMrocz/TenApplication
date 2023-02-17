@@ -30,22 +30,29 @@ namespace TenApplication.Repositories
                     .ThenInclude(i => i.InboxItem.Job)
                 .Include(r => r.RaportRecords)
                     .ThenInclude(i => i.InboxItem.Inbox.User)
+                .Include(r => r.RaportRecords)
+                    .ThenInclude(i => i.InboxItem.CatRecords.Where(crec => crec.InboxItemId == ).Select(crec => crec.Hours))
                     .Select(r => new RaportDto(){
                         RaportId = r.RaportId
-                        RaportCreateDate { get; set; }
-                        AllRaportHours { get; set; }
-                        RaportRecords { get; set; }
-                    })
-                    .Select(i => new InboxItemDto(){
-                        InboxItemId=
-                        Components=
-                        DrawingsComponents=
-                        DrawingsAssembly=
-                        Ecm=
-                        Gpdm=
-                        DueDate=
-                        Started=
-                        Finished=
+                        RaportCreateDate = r.RaportCreateDate
+                        AllRaportHours = r.AllRaportHours
+                        RaportRecords = r.RaportRecords.Select(rec => new RaportRecordDto(){
+                            RaportRecordId = rec.RaportRecordId
+                            RaportRecordHours = rec.RaportRecordHours
+                            Components = rec.InboxItem.Components
+                            DrawingsComponents = rec.InboxItem.DrawingsComponents
+                            DrawingsAssembly = rec.InboxItem.DrawingsAssembly
+                            Name = rec.InboxItem.Inbox.Designer.Name
+                            Surname = rec.InboxItem.Inbox.Designer.Surname
+                            Software = rec.InboxItem.Job.Software
+                            Ecm = rec.InboxItem.Job.Ecm
+                            Gpdm = rec.InboxItem.Job.Gpdm
+                            ProjectNumber = rec.InboxItem.Job.ProjectNumber
+                            Client = rec. InboxItem.Job.Client         
+                            DueDate = rec.InboxItem.Job.DueDate
+                            Started = rec.InboxItem.Job.Started
+                            Finished = rec.InboxItem.Job.Finished
+                        })
                     })
             return result;
         }
