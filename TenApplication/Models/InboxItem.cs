@@ -6,7 +6,8 @@ namespace TenApplication.Models
     public class InboxItem
     {
         public int InboxItemId { get; set; }
-        [Range(0, 1000,ErrorMessage ="Value out of range!")]
+        [Precision(2)]
+        [Range(0, 500, ErrorMessage = "Hours number out of range!")]
         public double Hours { get; set; } = 0;
         [Range(0, 1000, ErrorMessage = "Value out of range!")]
         public int Components { get; set; } = 0;

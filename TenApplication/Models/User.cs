@@ -26,13 +26,15 @@ namespace TenApplication.Models
     public abstract class User
     {
         public int UserId { get; set; }
+        [NameValidator(50)]
         public required string Name { get; set; }
+        [NameValidator(50)]
         public required string Surname { get; set; }
+        [EmailValidator(50)]
         [DataType(DataType.EmailAddress)]
         public required string Email { get; set; }
+        [Phone(ErrorMessage = "Wprowadz poprawny format numeru telefonu!")]
         public string? Phone { get; set; }
-        [Required(ErrorMessage = "Pole CCtr nie może być puste!")]
-        [RegularExpression("/[A-Z]{2}[0-9]{4}/g", ErrorMessage = "Wporowadź poprawny format!")]
         public string DisplayName
         {
             get
@@ -44,11 +46,12 @@ namespace TenApplication.Models
 
     public class Designer : User, IValidatableObject
     {
-        public string? PasswordHash { get; set; }
-        [Phone(ErrorMessage = "Wprowadz poprawny format numeru telefonu!")]
+        public string? PasswordHash { get; set; }     
+        [Required(ErrorMessage = "Pole ActTyp nie może być puste!")]
+        [RegularExpression("/[A-Z]{2}[0-9]{4}/g", ErrorMessage = "Wporowadź poprawny format cctr!")]
         public required string CCtr { get; set; }
         [Required(ErrorMessage = "Pole ActTyp nie może być puste!")]
-        [RegularExpression("/[A-Z]{1}[0-9]{5}/g", ErrorMessage = "Wporowadź poprawny format!")]
+        [RegularExpression("/[A-Z]{1}[0-9]{4}/g", ErrorMessage = "Wporowadź poprawny format acttyp!")]
         public required string ActTyp { get; set; }
         [Required]
         [EnumDataType(typeof(UserRole))]
