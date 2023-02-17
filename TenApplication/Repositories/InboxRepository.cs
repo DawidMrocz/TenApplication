@@ -86,5 +86,30 @@ namespace TenApplication.Repositories
             await _applicationDbContext.InboxItems.Where(p => p.InboxItemId == inboxItemId).ExecuteDeleteAsync();
         }
 
+        public async Task AddCatRecord(int inboxItemId, int userId, DateTime entryDate, double hours)
+        {
+            Cat? userCat = await _applicationDbContext.Cat.FirstOrDefaultAsync(c => c.UserId == userId)
+
+            if(userCat is null) {
+                userCat = new Cat(){
+                    UserId = userId                
+                    CatRecords = new List<CatRecord>();
+                }
+                await _applicationDbContext.Cat.AddAsync(userCat);
+            };
+
+            CatRecord newCatRecord = new()
+            {
+                CellHours = hours 
+                Created = entryDate    
+                InboxItemId = inboxItemId    
+            };
+
+            await userCat.AddAsync(newCatRecord);
+            
+            await _applicationDbContext.CatRecords.AddAsync(newCatRecord);
+            await _applicationDbContext.SaveChangesAsync();
+        }
+
     }
 }

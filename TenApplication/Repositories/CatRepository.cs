@@ -16,30 +16,42 @@ namespace TenApplication.Repositories
         public async Task<List<Cat>> GetAll(int userId)
         {
             return await _applicationDbContext.Cat
+                .Include(rec => rec.CatRecords.Select(d => d.Created))
                 .Where(u => u.UserId == userId)
+                .Select(c => c.Created)
                 .AsNoTracking()
                 .OrderBy(c => c.CatCreateDate)
                 .ToListAsync();
         }
 
-        public async Task<Cat> GetById(int CatId)
+        public async Task<CatDto> GetById(int catId)
         {
-            Cat? result = await _applicationDbContext.Cat.AsNoTracking().SingleOrDefaultAsync(c => c.CatId == CatId);
-            return result;
+            return await _applicationDbContext.Cat
+                .AsSplitQuery()
+                .Include(d => d.Designer)
+                .Include(rec => rec.CatRecords)
+                .ThenInclude(j => j.Job)
+                .Where(u => u.CatId == catId)
+                .Select(c => new CatDto(){
+                    CatId = c.CatId
+                    CCtr = c.Designer.CCtr   
+                    ActTyp = c.Designer.ActTyp 
+                    CatRecords = c.CatRecords.Select(c => new CatRecordDto(){
+                        CatRecordId = c.CatRecordId   
+                        CellHours = c.CellHours
+                        Created = c.Created               
+                        Region = c.Job.Region
+                        ProjectNumber =c.Job.ProjectNumber 
+                        ProjectName = c.Job.ProjectName   
+                        SapText = c.Job.SapText
+                        Receiver = c.Job.Receiver 
+                    }).ToListAsync();
+                })
+                .AsNoTracking()
+                .FirtsOrDefaultAsync();
         }
 
-        public async Task CreateCatRecord(int inboxItemId, int catId)
-        {
-            CatRecord newCatRecord = new()
-            {
-                DayHours = 0,
-                Day = DateTime.Now,
-                CatId = catId,
-                InboxItemId = inboxItemId
-            };
-            await _applicationDbContext.CatRecords.AddAsync(newCatRecord);
-            await _applicationDbContext.SaveChangesAsync();
-        }
+        
 
         public async Task DeleteCatRecord(int catRecordId)
         {

@@ -17,9 +17,9 @@ namespace TenApplication.Models
         public int DrawingsAssembly { get; set; } = 0;
 
         //RELATIONS
-        public int? JobId { get; set; }
+        public int JobId { get; set; }
         public Job? Job { get; set; }
-        public int? InboxId { get; set; }
+        public int InboxId { get; set; }
         public Inbox? Inbox { get; set; }
         public List<CatRecord> CatRecords { get; set; } = new List<CatRecord>();
     }
