@@ -1,0 +1,40 @@
+﻿@model TenApplication.Dtos.DesignerDTOModels.RegisterDto
+@{
+    ViewData["Title"] = "Register";
+}
+
+<form method="post" action="Register" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="exampleInputEmail1">Name</label>
+        <input type="text" class="form-control" placeholder="Name..." asp-for="Name">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">CCtr</label>
+        <input type="text" class="form-control" placeholder="CCtr..." asp-for="CCtr">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">ActTyp</label>
+        <input type="text" class="form-control" placeholder="ActTyp..." asp-for="ActTyp">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" asp-for="Email">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" asp-for="Password">
+    </div>
+
+    <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    </div>
+
+    <div class="mb-3">
+        <label for="formFile" class="form-label">Default file input example</label>
+        <input class="form-control" type="file" id="formFile" asp-for="ProfilePhoto">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

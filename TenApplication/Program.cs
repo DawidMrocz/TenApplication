@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
+using TenApplication.Models;
 using TenApplication.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +22,19 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "SampleInstance";
 });
 
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(option =>
+//    {
+//        option.LoginPath = "/Access/Login";
+//        option.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+//    });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IPasswordHasher<Designer>, PasswordHasher<Designer>>();
+
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ICatRepository, CatRepository>();
+builder.Services.AddScoped<IRaportRepository, RaportRepository>();
 builder.Services.AddScoped<IDesignerRepository, DesignerRepository>();
 builder.Services.AddScoped<IInboxRepository, InboxRepository>();
 
