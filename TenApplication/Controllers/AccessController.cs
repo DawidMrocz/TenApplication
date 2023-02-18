@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TenApplication.DTO;
-using TenApplication.DTO.DesignerDTO;
 using TenApplication.Models;
 using TenApplication.Repositories;
 using System.Net;
 using System.Security.Claims;
+using TenApplication.Dtos.DesignerDTOModels;
+using TenApplication.Dtos;
 
 namespace TenApplication.Controllers
 {
@@ -20,8 +20,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<bool>> Login([FromForm] LoginDto command)
         {
             bool logInProccess = await _userRepository.LoginDesigner(command);
@@ -45,8 +43,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Designer), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Register(RegisterDto command)
         {
             if (!ModelState.IsValid) throw new BadHttpRequestException("Bad data");

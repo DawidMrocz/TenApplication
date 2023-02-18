@@ -1,10 +1,10 @@
-using TenApplication.Models;
+using TenApplication.Dtos.RaportDTOModels;
 
 namespace TenApplication.Repositories
 {
     public interface IRaportRepository
     {
-        public Task<List<RaportRecord>> GetAll();
-        public Task<RaportRecord> GetById(int raportId);
+        public Task<List<RaportRecordDto>> GetAll();
+        public Task<List<RaportRecordDto>> GetById(int raportId);
     }
 }

@@ -1,5 +1,5 @@
-﻿using TenApplication.DTO;
-using TenApplication.Dtos;
+﻿using TenApplication.Dtos;
+using TenApplication.Dtos.JobDTOModels;
 using TenApplication.Models;
 
 namespace TenApplication.Repositories

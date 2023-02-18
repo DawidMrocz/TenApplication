@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TenApplication.Repositories;
-using System.Net;
 using System.Security.Claims;
-using TenApplication.DTO.DesignerDTO;
-using TenApplication.DTO;
 using TenApplication.Models;
+using TenApplication.Dtos.DesignerDTOModels;
+using TenApplication.Dtos;
 
 namespace TenApplication.Controllers
 {
@@ -57,12 +56,12 @@ namespace TenApplication.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<Designer>> UpdateDesigner([FromBody] UpdateDto updateDesigner)
+        public async Task<ActionResult<Designer>> UpdateDesigner([FromBody] UpdateDto updateDesigner, [FromRoute]int userId)
         {
             var DesignerId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
             try
             {
-                Designer newDesigner = await _DesignerRepository.UpdateDesigner(updateDesigner, DesignerId);
+                Designer newDesigner = await _DesignerRepository.UpdateDesigner(updateDesigner,userId);
                 return Ok(newDesigner);
             }
             catch (Exception ex)

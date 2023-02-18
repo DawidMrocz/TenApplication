@@ -1,6 +1,4 @@
-﻿using TenApplication.DTO.InboxDTO;
-using TenApplication.Models;
-using TenApplicationt.DTO.InboxDTO;
+﻿using TenApplication.Dtos.InboxDTO;
 
 namespace TenApplication.Repositories
 {

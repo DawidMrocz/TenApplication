@@ -1,3 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Security.Claims;
+using TenApplication.ActionFilters;
+using TenApplication.Dtos.InboxDTO;
+using TenApplication.Helpers;
+using TenApplication.Models;
+using TenApplication.Repositories;
+
 namespace TenApplication.Controllers
 {
     [Authorize]
@@ -8,8 +18,10 @@ namespace TenApplication.Controllers
         private readonly IDistributedCache _cache;
 
         public InboxController(
-            IInboxRepository inboxRepository, 
-            ILogger<HomeController> logger,
+            IInboxRepository inboxRepository,
+            ICatRepository catRepository,
+            IRaportRepository raportRepository,
+            ILogger<InboxController> logger,
             IDistributedCache cache
             )
         {
@@ -22,10 +34,10 @@ namespace TenApplication.Controllers
         public async Task<ActionResult<InboxDto>> Inbox()
         {
             string key = $"Inbox_user_{int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value)}";
-            Inbox? userInbox = await _cache.GetRecordAsync<InboxDto>(key);
+            InboxDto? userInbox = await _cache.GetRecordAsync<InboxDto>(key);
                 if (userInbox is null)
                 {
-                        userInbox = await _inboxRepository.GetInbox(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value));iatr.Send(getUsersQuery));
+                        userInbox = await _inboxRepository.GetInbox(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value));
                         await _cache.SetRecordAsync(key, userInbox);               
                 }         
             return View(userInbox);
@@ -34,13 +46,11 @@ namespace TenApplication.Controllers
         [HttpPost]
         [IdProvidedValidation(IdName = "inboxItemId")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult<InboxItem>> UpdateInboxItem([FromForm] UpdateInboxItemDto updateInboxItemDto,Guid inboxItemId,DateTime entryDate)
+        public async Task<ActionResult<InboxItem>> UpdateInboxItem([FromForm] UpdateInboxItemDto updateInboxItemDto,int inboxItemId,DateTime entryDate)
         {       
-            var authenticatedId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
 
             await _inboxRepository.UpdateInboxItem(updateInboxItemDto, inboxItemId);
-            var catItem = await _catRepository.CreateCat(authenticatedId, inboxItemId,entryDate);
-            await _raportRepository.CreateRaport(authenticatedId, catItem, inboxItemId, entryDate);
             return RedirectToAction("Inbox", "Inbox");
         }
 
@@ -48,7 +58,7 @@ namespace TenApplication.Controllers
         [IdProvidedValidation(IdName = "inboxItemId")]
         public async Task<ActionResult<bool>> DeleteInboxItem([FromRoute] int inboxItemId)
         {
-            bool myInboxItem = await _inboxRepository.DeleteInboxItem(Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value), inboxItemId);
+            await _inboxRepository.DeleteInboxItem(inboxItemId);
 
             return Ok(true);
         }

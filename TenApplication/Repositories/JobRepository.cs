@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
-using TenApplication.DTO;
-using TenApplication.DTO.DesignerDTO;
 using TenApplication.Dtos;
+using TenApplication.Dtos.DesignerDTOModels;
+using TenApplication.Dtos.JobDTOModels;
 using TenApplication.Models;
 
 namespace TenApplication.Repositories
@@ -19,7 +19,7 @@ namespace TenApplication.Repositories
         {
             IQueryable<Job> query = _applicationDbContext.Jobs
                 .Include(e => e.Engineer!.DisplayName)
-                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Desinger))
+                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Designer))
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -29,8 +29,8 @@ namespace TenApplication.Repositories
                     s => s.Received.ToString().Contains(queryParams.SearchBy) ||
                     s.DueDate.ToString().Contains(queryParams.SearchBy) ||
                     s.Engineer!.DisplayName.Contains(queryParams.SearchBy) ||
-                    s.InboxItems!.Any(d => d.Inbox!.Desinger.Name.Contains(queryParams.SearchBy)) ||
-                    s.InboxItems!.Any(d => d.Inbox!.Desinger.Surname.Contains(queryParams.SearchBy))
+                    s.InboxItems!.Any(d => d.Inbox!.Designer.Name.Contains(queryParams.SearchBy)) ||
+                    s.InboxItems!.Any(d => d.Inbox!.Designer.Surname.Contains(queryParams.SearchBy))
                 );
 
             if (queryParams.Ecm is not null) query = query.Where(s => s.Ecm == queryParams.Ecm);
@@ -70,7 +70,7 @@ namespace TenApplication.Repositories
         public async Task<JobDto> GetById(int? id)
         {
             JobDto? Job = await _applicationDbContext.Jobs
-                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Desinger))
+                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Designer))
                 .Include(e => e.Engineer!.DisplayName)
                 .Select(p => new JobDto()
                 {
@@ -93,10 +93,10 @@ namespace TenApplication.Repositories
                     Finished = p.Finished,
                     Designers = p.InboxItems!.Select(i => new DesignerDto()
                     {
-                        Name = i.Inbox!.Desinger.Name,
-                        Surname = i.Inbox!.Desinger.Surname,
-                        Photo = i.Inbox!.Desinger.Photo,
-                        Level = i.Inbox!.Desinger.Level
+                        Name = i.Inbox!.Designer.Name,
+                        Surname = i.Inbox!.Designer.Surname,
+                        Photo = i.Inbox!.Designer.Photo,
+                        Level = i.Inbox!.Designer.Level
 
                     }).OrderBy(d => d.Name).ToList()
                 })

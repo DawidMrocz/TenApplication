@@ -13,8 +13,8 @@ namespace TenApplication.Dtos.RaportDTOModels
         public int DrawingsAssembly { get; set; }
 
         //RELATIONS
-        public string Name { get; set; }
-        public string Surname { get; set; }
+        public string? Name { get; set; }
+        public string? Surname { get; set; }
         public string DisplayName
         {
             get

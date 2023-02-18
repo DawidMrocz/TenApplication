@@ -8,7 +8,7 @@ namespace TenApplication.Models
 
         //RELATIONS
         public int DesignerId { get; set; }
-        public Designer Desinger { get; set; } = null!;
+        public Designer Designer { get; set; } = null!;
         public List<InboxItem> InboxItems { get; set; } = new List<InboxItem>();
     }
 }

@@ -1,6 +1,6 @@
-﻿using TenApplication.DTO;
-using TenApplication.DTO.DesignerDTO;
-using TenApplication.DTO.InboxDTO;
+﻿
+using TenApplication.Dtos;
+using TenApplication.Dtos.DesignerDTOModels;
 using TenApplication.Models;
 
 namespace TenApplication.Repositories
@@ -17,6 +17,6 @@ namespace TenApplication.Repositories
 
         public Task<Designer> CreateDesigner(RegisterDto command);
         public Task<bool> DeleteDesigner(int DesignerId);
-        public Task<Designer> UpdateDesigner(UpdateDto command, int DesignerId);
+        public Task<Designer> UpdateDesigner(UpdateDto command,int userId);
     }
 }

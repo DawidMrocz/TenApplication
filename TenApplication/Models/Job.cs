@@ -43,7 +43,7 @@ namespace TenApplication.Models
         public int Gpdm { get; set; }
         [EnumDataType(typeof(Region))]
         public required Region? Region { get; set; }
-        [RegularExpression("/([A-Z]{1}[0-9]{9})\w+/g")]
+        [RegularExpression("/([A-Z]{1}[0-9]{9})+/g")]
         public string? ProjectNumber { get; set; }
         [EnumDataType(typeof(Client))]
         public Client? Client { get; set; }      

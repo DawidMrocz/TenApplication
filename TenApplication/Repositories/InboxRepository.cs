@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
-using TenApplication.DTO.InboxDTO;
+using TenApplication.Dtos.InboxDTO;
 using TenApplication.Models;
-using TenApplicationt.DTO.InboxDTO;
 
 namespace TenApplication.Repositories
 {
@@ -16,9 +15,8 @@ namespace TenApplication.Repositories
         public async Task<InboxDto> GetInbox(int userId)
         {
             return await _applicationDbContext.Inboxs
-                .AsSplitQuery()
                 .AsNoTracking()
-                .Include(d => d.Desinger)
+                .Include(d => d.Designer)
                 .Include(i => i.InboxItems!)
                 .ThenInclude(j => j.Job)
                 .Select(i => new InboxDto()
@@ -26,10 +24,10 @@ namespace TenApplication.Repositories
                     InboxId = i.InboxId,
                     TaskQuantity = i.InboxItems!.Count(),
                     AllHours = i.InboxItems!.Sum(h => h.Hours),
-                    UserId = i.Desinger.UserId,
-                    Name = i.Desinger.Name,
-                    Surname = i.Desinger.Surname,
-                    Photo = i.Desinger.Photo,
+                    UserId = i.Designer.UserId,
+                    Name = i.Designer.Name,
+                    Surname = i.Designer.Surname,
+                    Photo = i.Designer.Photo,
                     InboxItems = i.InboxItems!.Select(i => new InboxItemDto()
                     {
                         InboxItemId = i.InboxItemId,
@@ -96,16 +94,20 @@ namespace TenApplication.Repositories
 
             CatRecord newCatRecord = new()
              { 
-                CellHours = hours 
-                Created = entryDate    
+                CellHours = hours,
+                Created = entryDate,   
                 InboxItemId = inboxItemId   
              };
 
             if(userCat is null) {
-                userCat = new Cat(){
-                    UserId = userId                
-                    CatRecords = CatRecords.Add(newCatRecord);
-                }
+                userCat = new Cat()
+                {
+                    UserId = userId,
+                    CatRecords = new List<CatRecord>()
+                    {
+                        newCatRecord
+                    }
+                };
                 await _applicationDbContext.Cats.AddAsync(userCat);                    
             }
             else
@@ -113,15 +115,16 @@ namespace TenApplication.Repositories
                 CatRecord? userCatRecord = await _applicationDbContext.CatRecords.FirstOrDefaultAsync(rec => rec.CatId == userCat.CatId && rec.Created == entryDate);
 
                 if(userCatRecord is null){
-                    userCat.CatRecords.AddAsync(newCatRecord);
-                    RaportRecord raportRecord = new(){
-                        RaportCreateDate = entryDate
-                        InboxItemId = inboxItemId    
-                    }
+                    userCat.CatRecords.Add(newCatRecord);
+                    RaportRecord raportRecord = new()
+                    {
+                        RaportCreateDate = entryDate,
+                        InboxItemId = inboxItemId
+                    };
                     await _applicationDbContext.RaportRecords.AddAsync(raportRecord);     
                 }
                 else {
-                    userCatRecord.Hours = hours;      
+                    userCatRecord.CellHours = hours;      
                 }                
             };
             await _applicationDbContext.SaveChangesAsync();
@@ -135,9 +138,9 @@ namespace TenApplication.Repositories
                 c => c.UserId == userId && 
                 c.CatRecords.Any(rec => rec.Created == entryDate));
 
-            CatRecord? recordToDelete = userCat.CatRecords.FirstOrDefaultAsync(r => r.InboxItemId == inboxItemId && r.Created = entryDate)
+            CatRecord? recordToDelete = userCat!.CatRecords.FirstOrDefault(r => r.InboxItemId == inboxItemId && r.Created.Equals(entryDate));
 
-            await _applicationDbContext.CatRecords.Remove(recordToDelete)
+            _applicationDbContext.CatRecords.Remove(recordToDelete);
 
             if(userCat.CatRecords.Where(r => r.InboxItemId == inboxItemId).Count() == 0){
                 await _applicationDbContext.RaportRecords.Where(p => p.InboxItemId== inboxItemId).ExecuteDeleteAsync();

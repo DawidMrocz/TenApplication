@@ -21,11 +21,11 @@ namespace TenApplication.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Raport>()
+            modelBuilder.Entity<RaportRecord>()
             .Property(b => b.RaportCreateDate).ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<Cat>()
-            .Property(b => b.CatCreateDate).ValueGeneratedOnAdd();
+            modelBuilder.Entity<CatRecord>()
+            .Property(b => b.Created).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<Job>()
             .Property(b => b.Received).ValueGeneratedOnAdd();

@@ -1,4 +1,6 @@
 ﻿
+using TenApplication.Models;
+
 namespace TenApplication.Dtos.InboxDTO
 {
     public class InboxItemDto
@@ -16,6 +18,6 @@ namespace TenApplication.Dtos.InboxDTO
         public DateTime? DueDate { get; set; }
         public DateTime? Started { get; set; }
         public DateTime? Finished { get; set; }
-        public List<CatRecord> CatRecords { get; set; }
+        public List<CatRecord>? CatRecords { get; set; }
     }
 }

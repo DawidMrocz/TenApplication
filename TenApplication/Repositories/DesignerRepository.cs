@@ -5,14 +5,13 @@ using Microsoft.Extensions.Caching.Distributed;
 using TenApplication.Data;
 using System.Security.Claims;
 using TenApplication.Helpers;
-using TenApplication.DTO.DesignerDTO;
 using Microsoft.EntityFrameworkCore;
-using TenApplication.DTO;
 using MailKit.Security;
 using MimeKit;
 using MailKit.Net.Smtp;
-using TenApplication.DTO.InboxDTO;
 using TenApplication.Models;
+using TenApplication.Dtos.DesignerDTOModels;
+using TenApplication.Dtos;
 
 namespace TenApplication.Repositories
 {
@@ -93,9 +92,6 @@ namespace TenApplication.Repositories
 
             Inbox newInbox = new()
             {
-
-                TaskQuantity = 0,
-                AllHours = 0,
                 DesignerId = newDesigner.UserId,
                 InboxItems = new List<InboxItem>()
             };
@@ -156,9 +152,9 @@ namespace TenApplication.Repositories
             return true;
         }
 
-        public async Task<Designer> UpdateDesigner(UpdateDto command, int UserId)
+        public async Task<Designer> UpdateDesigner(UpdateDto command,int userId)
         {
-            var currentDesigner = await _context.Designers.SingleAsync(r => r.UserId == UserId);
+            var currentDesigner = await _context.Designers.SingleAsync(r => r.UserId == userId);
 
             if (currentDesigner is null) throw new BadHttpRequestException("Bad");
 
@@ -177,7 +173,7 @@ namespace TenApplication.Repositories
                     }
                 }
             }
-            await _cache.DeleteRecordAsync<Designer>($"Profile_{UserId}");
+            await _cache.DeleteRecordAsync<Designer>($"Profile_{userId}");
             _context.SaveChanges();
             return currentDesigner;
         }

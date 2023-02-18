@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using TenApplication.Helpers;
 
 namespace TenApplication.Models
 {
@@ -66,7 +67,7 @@ namespace TenApplication.Models
         public DateTime TennecoStartDate { get; set; }
         public Inbox Inbox { get; set; } = null!;
         public List<Cat> Cats { get; set; } = new List<Cat>();
-        public List<Raport> Raports { get; set; } = new List<Raport>();
+        public List<RaportRecord> RaportRecordss { get; set; } = new List<RaportRecord>();
         public double Experience
         {
             get

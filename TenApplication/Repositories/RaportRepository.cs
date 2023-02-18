@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
 using TenApplication.Dtos.RaportDTOModels;
-using TenApplication.Models;
 
 namespace TenApplication.Repositories
 {
@@ -16,46 +15,49 @@ namespace TenApplication.Repositories
         public async Task<List<RaportRecordDto>> GetAll()
         {
             List<RaportRecordDto>? records = await _applicationDbContext.RaportRecords
-                .OrderBy(c => c.RaportCreateDate)
                 .AsNoTracking()
                 .Select(r => new RaportRecordDto()
                 {
-                    RaportCreateDate = r.RaportCreateDate
-                })             
-                .Distinct()             
+                    RaportCreateDate= r.RaportCreateDate
+                })
+                .OrderBy(d => d.RaportCreateDate)
                 .ToListAsync();
-            return records;
-1       }
 
-        public async Task<RaportRecordDto> GetById(int CatId)
+            return records;
+        }
+
+        public async Task<List<RaportRecordDto>> GetById(int CatId)
         {
-            return await _applicationDbContext.RaportRecords
+            List<RaportRecordDto>? records = await _applicationDbContext.RaportRecords
                 .Include(i => i.InboxItem)
                     .ThenInclude(j => j.Job)
                 .Include(i => i.InboxItem)
                     .ThenInclude(i => i.Inbox)
-                    .ThenInclude(d => d.Desinger)
+                        .ThenInclude(d => d.Designer)
+                .Include(i => i.InboxItem)
+                    .ThenInclude(i => i.CatRecords)
                     .Select(r => new RaportRecordDto(){
                         RaportCreateDate = r.RaportCreateDate,
-                        RaportRecordHours = r.,
-                        RaportRecords = r.RaportRecords.Select(rec => new RaportRecordDto(){
-                            RaportRecordId = rec.RaportRecordId,
-                            RaportRecordHours = rec.RaportRecordHours,
-                            Components = rec.InboxItem.Components,
-                            DrawingsComponents = rec.InboxItem.DrawingsComponents,
-                            DrawingsAssembly = rec.InboxItem.DrawingsAssembly,
-                            Name = rec.InboxItem.Inbox.Designer.Name,
-                            Surname = rec.InboxItem.Inbox.Designer.Surname,
-                            Software = rec.InboxItem.Job.Software,
-                            Ecm = rec.InboxItem.Job.Ecm,
-                            Gpdm = rec.InboxItem.Job.Gpdm,
-                            ProjectNumber = rec.InboxItem.Job.ProjectNumber,
-                            Client = rec. InboxItem.Job.Client,        
-                            DueDate = rec.InboxItem.Job.DueDate,
-                            Started = rec.InboxItem.Job.Started,
-                            Finished = rec.InboxItem.Job.Finished
-                        }).ToList()
-                    });
+                        RaportRecordHours = r.InboxItem!.CatRecords.Sum(h => h.CellHours),
+         
+                            RaportRecordId = r.RaportRecordId,
+                            Components = r.InboxItem.Components,
+                            DrawingsComponents = r.InboxItem.DrawingsComponents,
+                            DrawingsAssembly = r.InboxItem.DrawingsAssembly,
+                            Name = r.InboxItem.Inbox.Designer.Name,
+                            Surname = r.InboxItem.Inbox.Designer.Surname,
+                            Software = r.InboxItem.Job.Software,
+                            Ecm = r.InboxItem.Job.Ecm,
+                            Gpdm = r.InboxItem.Job.Gpdm,
+                            ProjectNumber = r.InboxItem.Job.ProjectNumber,
+                            Client = r.InboxItem.Job.Client,        
+                            DueDate = r.InboxItem.Job.DueDate,
+                            Started = r.InboxItem.Job.Started,
+                            Finished = r.InboxItem.Job.Finished
+            
+                    }).ToListAsync();
+
+            return records;
         }
     }
 }
