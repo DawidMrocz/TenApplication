@@ -27,6 +27,7 @@ namespace TenApplication.Repositories
         {
             RaportDto? raport = await _applicationDbContext.Raports
                 .AsSingleQuery()
+                .AsNoTracking()
                 .Include(rec => rec.RaportRecords)
                     .ThenInclude(i => i.InboxItem)
                         .ThenInclude(j => j.Job)
@@ -37,24 +38,38 @@ namespace TenApplication.Repositories
                 .Select(r => new RaportDto()
                 {
                     RaportDate = r.RaportDate,
-                    RaportRecords = r.RaportRecords.Select(r => new RaportRecordDto()
+                    RaportHours= r.RaportRecords.Sum(h => h.RaportRecordHours),
+                    UserRaportHours = r.RaportRecords.GroupBy(c => c.InboxItem.Inbox!.Designer.Name).Select(grp => new UserRaportHours()
                     {
-                        RaportRecordId = r.RaportRecordId,
-                        Components = r.InboxItem.Components,
-                        DrawingsComponents = r.InboxItem.DrawingsComponents,
-                        DrawingsAssembly = r.InboxItem.DrawingsAssembly,
-                        Name = r.InboxItem.Inbox.Designer.Name,
-                        Surname = r.InboxItem.Inbox.Designer.Surname,
-                        Software = r.InboxItem.Job.Software,
-                        Ecm = r.InboxItem.Job.Ecm,
-                        Gpdm = r.InboxItem.Job.Gpdm,
-                        ProjectNumber = r.InboxItem.Job.ProjectNumber,
-                        Client = r.InboxItem.Job.Client,
-                        DueDate = r.InboxItem.Job.DueDate,
-                        Started = r.InboxItem.Job.Started,
-                        Finished = r.InboxItem.Job.Finished
+                        UserName = grp.Key,
+                        UserHours = grp.Sum(r => r.RaportRecordHours)
+                    }).ToList(),
+                    GroupOfRecords = r.RaportRecords.GroupBy(c => c.InboxItem.Job!.Client)
+                    .Select(grp => new GroupedRecordsDto()
+                    {
+                        ClientName = grp.Key.ToString()!,
+                        GroupHours = grp.Sum(h => h.RaportRecordHours),
+                        RaportRecords = grp.Select(r => new RaportRecordDto()
+                        {
+                            RaportRecordId = r.RaportRecordId,
+                            Components = r.InboxItem.Components,
+                            DrawingsComponents = r.InboxItem.DrawingsComponents,
+                            DrawingsAssembly = r.InboxItem.DrawingsAssembly,
+                            Name = r.InboxItem.Inbox!.Designer.Name,
+                            Surname = r.InboxItem.Inbox.Designer.Surname,
+                            Software = r.InboxItem.Job!.Software,
+                            Ecm = r.InboxItem.Job.Ecm,
+                            Gpdm = r.InboxItem.Job.Gpdm,
+                            ProjectNumber = r.InboxItem.Job.ProjectNumber,
+                            Client = r.InboxItem.Job.Client,
+                            DueDate = r.InboxItem.Job.DueDate,
+                            Started = r.InboxItem.Job.Started,
+                            Finished = r.InboxItem.Job.Finished
+                        }).OrderBy(d => d.Name).ThenBy(d => d.Started).ToList()
                     }).ToList()
                 }).FirstOrDefaultAsync(r => r.RaportId == raportId);
+
+            if (raport is null) throw new BadHttpRequestException("Raport do not exist!");
 
             return raport;
         }

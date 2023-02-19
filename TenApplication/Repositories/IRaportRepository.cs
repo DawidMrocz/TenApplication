@@ -6,6 +6,6 @@ namespace TenApplication.Repositories
     public interface IRaportRepository
     {
         public Task<List<Raport>> GetAll();
-        public Task<List<RaportRecordDto>> GetById(int raportId);
+        public Task<RaportDto> GetById(int raportId);
     }
 }

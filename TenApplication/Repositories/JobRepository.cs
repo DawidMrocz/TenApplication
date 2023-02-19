@@ -26,8 +26,8 @@ namespace TenApplication.Repositories
             if (queryParams.SearchBy != null) queryParams.PageNumber = 1;
 
             if (!String.IsNullOrEmpty(queryParams.SearchBy)) query = query.Where(
-                    s => s.Received.ToString().Contains(queryParams.SearchBy) ||
-                    s.DueDate.ToString().Contains(queryParams.SearchBy) ||
+                    s => s.Received.ToString()!.Contains(queryParams.SearchBy) ||
+                    s.DueDate.ToString()!.Contains(queryParams.SearchBy) ||
                     s.Engineer!.DisplayName.Contains(queryParams.SearchBy) ||
                     s.InboxItems!.Any(d => d.Inbox!.Designer.Name.Contains(queryParams.SearchBy)) ||
                     s.InboxItems!.Any(d => d.Inbox!.Designer.Surname.Contains(queryParams.SearchBy))

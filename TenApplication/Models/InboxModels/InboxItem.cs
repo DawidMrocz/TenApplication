@@ -19,9 +19,9 @@ namespace TenApplication.Models
 
         //RELATIONS
         public int JobId { get; set; }
-        public Job? Job { get; set; }
+        public Job Job { get; set; } = null!;
         public int InboxId { get; set; }
-        public Inbox? Inbox { get; set; }
+        public Inbox Inbox { get; set; } = null!;
         public List<CatRecord> CatRecords { get; set; } = new List<CatRecord>();
     }
 }

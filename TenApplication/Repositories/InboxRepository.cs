@@ -86,16 +86,16 @@ namespace TenApplication.Repositories
             await _applicationDbContext.InboxItems.Where(p => p.InboxItemId == inboxItemId).ExecuteDeleteAsync();
         }
 
-        public async Task AddCatRecord(int inboxItemId, int userId, DateTime entryDate, double hours)
-        {           
+        public async Task SendHours(int inboxItemId, int userId, DateTime entryDate, double hours)
+        {
             Cat? userCat = await _applicationDbContext.Cats
             .Include(rec => rec.CatRecords)
                 .ThenInclude(c => c.CatRecordCells)
             .FirstOrDefaultAsync(
-                c => c.UserId == userId && 
+                c => c.UserId == userId &&
                 c.CatDate == entryDate);
 
-            if(userCat is null)
+            if (userCat is null)
             {
                 userCat = new Cat()
                 {
@@ -106,50 +106,71 @@ namespace TenApplication.Repositories
                 await _applicationDbContext.Cats.AddAsync(userCat);
             }
 
-            if(!userCat.CatRecords.Any(i => i.InboxItemId == inboxItemId)) {
-                CatRecord newRecord = new()
-                { 
-                    CatId=userCat.CatId,
-                    InboxItemId=inboxItemId,
+            CatRecord? userCatRecord = userCat.CatRecords.FirstOrDefault(r => r.InboxItemId == inboxItemId);
+
+            if (userCatRecord is null) {
+                userCatRecord = new CatRecord()
+                {
+                    CatId = userCat.CatId,
+                    InboxItemId = inboxItemId,
                     CatRecordCells = new List<CatRecordCell>()
                 };
-                await _applicationDbContext.CatRecords.AddAsync(newRecord);                    
+                await _applicationDbContext.CatRecords.AddAsync(userCatRecord);
             }
-            else
-            {              
-                CatRecord? userCatRecord = await _applicationDbContext.CatRecords.FirstOrDefaultAsync(rec => rec.CatId == userCat.CatId && rec.Created == entryDate);
 
-                if(userCatRecord is null){
-                    userCat.CatRecords.Add(newCatRecord);
-                    RaportRecord raportRecord = new()
-                    {
-                        RaportCreateDate = entryDate,
-                        InboxItemId = inboxItemId
-                    };
-                    await _applicationDbContext.RaportRecords.AddAsync(raportRecord);     
-                }
-                else {
-                    userCatRecord.CellHours = hours;      
-                }                
-            };
+            CatRecordCell? userCatRecordCell = userCatRecord.CatRecordCells.FirstOrDefault(c => c.CatRecordCellDate == entryDate);
+
+            if(userCatRecordCell is null)
+            {
+                userCatRecordCell = new CatRecordCell()
+                {
+                    CatRecordCellDate = entryDate,
+                    CatRecordId = userCatRecord.CatRecordId
+                };
+                await _applicationDbContext.CatRecordCells.AddAsync(userCatRecordCell);
+            }
+                
+            userCatRecordCell.CellHours = hours;
+
+            if (userCatRecord.InboxItem!.Job!.Region != Region.NA) return;
+
+            Raport? raport = await _applicationDbContext.Raports
+                .Include(r => r.RaportRecords)
+                .FirstOrDefaultAsync(d => d.RaportDate == entryDate);
+
+            if(raport is null)
+            {
+                raport = new Raport()
+                {
+                    RaportDate = entryDate,
+                };
+                await _applicationDbContext.Raports.AddAsync(raport);
+            }
+
+            RaportRecord? raportRecord = raport.RaportRecords.FirstOrDefault(i => i.InboxItemId == inboxItemId);
+
+            if(raportRecord is null)
+            {
+                raportRecord = new RaportRecord()
+                {
+                    RaportRecordDate = entryDate,
+                    InboxItemId = inboxItemId
+                };  
+            }
+
+            raportRecord.RaportRecordHours = userCatRecord.CatRecordCells.Sum(h => h.CellHours);
+
+            if(raportRecord.RaportRecordHours == 0 && raportRecord.InboxItem.Job!.Region == Region.NA)
+            {
+                _applicationDbContext.RaportRecords.Remove(raportRecord);
+            }
+         
+            if(raport.RaportRecords.Count == 0)
+            {
+                await _applicationDbContext.Raports.Where(p => p.RaportId == raport.RaportId).ExecuteDeleteAsync();
+            }
+
             await _applicationDbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteCatRecord(int inboxItemId,int catRecordId, int userId, DateTime entryDate)
-        {    
-            Cat? userCat = await _applicationDbContext.Cats
-            .Include(rec => rec.CatRecords)
-            .FirstOrDefaultAsync(
-                c => c.UserId == userId && 
-                c.CatRecords.Any(rec => rec.Created == entryDate));
-
-            CatRecord? recordToDelete = userCat!.CatRecords.FirstOrDefault(r => r.InboxItemId == inboxItemId && r.Created.Equals(entryDate));
-
-            _applicationDbContext.CatRecords.Remove(recordToDelete);
-
-            if(userCat.CatRecords.Where(r => r.InboxItemId == inboxItemId).Count() == 0){
-                await _applicationDbContext.RaportRecords.Where(p => p.InboxItemId== inboxItemId).ExecuteDeleteAsync();
-            }
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿
 using TenApplication.Models;
-
-using System.ComponentModel.DataAnnotations;
 using TenApplication.Dtos.InboxDTO;
+using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Dtos.DesignerDTOModels
 {

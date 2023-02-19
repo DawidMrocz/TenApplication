@@ -24,7 +24,7 @@ namespace TenApplication.Helpers
 
             if (await cache.GetStringAsync(recordId) is null) return default(T);
 
-            return JsonSerializer.Deserialize<T>(jsonData);
+            return JsonSerializer.Deserialize<T>(jsonData!);
         }
 
         public static async Task<T?> DeleteRecordAsync<T>(this IDistributedCache cache, string recordId)

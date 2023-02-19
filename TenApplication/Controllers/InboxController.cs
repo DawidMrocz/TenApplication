@@ -19,8 +19,6 @@ namespace TenApplication.Controllers
 
         public InboxController(
             IInboxRepository inboxRepository,
-            ICatRepository catRepository,
-            IRaportRepository raportRepository,
             ILogger<InboxController> logger,
             IDistributedCache cache
             )
@@ -33,11 +31,11 @@ namespace TenApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<InboxDto>> Inbox()
         {
-            string key = $"Inbox_user_{int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value)}";
+            string key = $"Inbox_user_{int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value)}";
             InboxDto? userInbox = await _cache.GetRecordAsync<InboxDto>(key);
                 if (userInbox is null)
                 {
-                        userInbox = await _inboxRepository.GetInbox(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value));
+                        userInbox = await _inboxRepository.GetInbox(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                         await _cache.SetRecordAsync(key, userInbox);               
                 }         
             return View(userInbox);
@@ -48,7 +46,7 @@ namespace TenApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult<InboxItem>> UpdateInboxItem([FromForm] UpdateInboxItemDto updateInboxItemDto,int inboxItemId,DateTime entryDate)
         {       
-            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
             await _inboxRepository.UpdateInboxItem(updateInboxItemDto, inboxItemId);
             return RedirectToAction("Inbox", "Inbox");

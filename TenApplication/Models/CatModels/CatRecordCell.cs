@@ -13,6 +13,10 @@ namespace TenApplication.Models.CatModels
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime Created { get; set; }
+        public DateTime CatRecordCellDate { get; set; }
+
+        //RELATIONS
+        public int CatRecordId { get; set; }
+        public CatRecord CatRecord { get; set; } = null!;
     }
 }

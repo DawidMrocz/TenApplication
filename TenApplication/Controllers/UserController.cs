@@ -25,7 +25,7 @@ namespace TenApplication.Controllers
         {
             try
             {
-                DesignerDto profile = await _DesignerRepository.GetProfile(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value));
+                DesignerDto profile = await _DesignerRepository.GetProfile(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return View(profile);
             }
             catch (Exception ex)
@@ -46,7 +46,7 @@ namespace TenApplication.Controllers
         {
             try
             {
-                bool profileDeleted = await _DesignerRepository.DeleteDesigner(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value));
+                bool profileDeleted = await _DesignerRepository.DeleteDesigner(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return profileDeleted;
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace TenApplication.Controllers
         [HttpPut]
         public async Task<ActionResult<Designer>> UpdateDesigner([FromBody] UpdateDto updateDesigner, [FromRoute]int userId)
         {
-            var DesignerId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            var DesignerId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
                 Designer newDesigner = await _DesignerRepository.UpdateDesigner(updateDesigner,userId);

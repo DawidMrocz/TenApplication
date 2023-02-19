@@ -121,7 +121,7 @@ namespace TenApplication.Repositories
 
             if (Designer is null) throw new BadHttpRequestException("Bad");
 
-            var result = _passwordHasher.VerifyHashedPassword(Designer, Designer.PasswordHash, command.Password);
+            var result = _passwordHasher.VerifyHashedPassword(Designer, Designer.PasswordHash!, command.Password);
 
             if (result == PasswordVerificationResult.Failed) throw new BadHttpRequestException("Bad");
 
@@ -212,7 +212,7 @@ namespace TenApplication.Repositories
 
             if (Designer is null) throw new BadHttpRequestException("Bad");
 
-            var result = _passwordHasher.VerifyHashedPassword(Designer, Designer.PasswordHash, oldPassword);
+            var result = _passwordHasher.VerifyHashedPassword(Designer, Designer.PasswordHash!, oldPassword);
 
             if (result == PasswordVerificationResult.Failed) throw new BadHttpRequestException("Bad");
 

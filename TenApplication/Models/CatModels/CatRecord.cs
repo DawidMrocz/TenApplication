@@ -10,9 +10,9 @@ namespace TenApplication.Models
    
         //RELATIONS        
         public int CatId { get; set; }
-        public Cat? Cat { get; set; }
+        public Cat Cat { get; set; } = null!;
         public int InboxItemId { get; set; }
-        public InboxItem? InboxItem { get; set; }
+        public InboxItem InboxItem { get; set; } = null!;
         public List<CatRecordCell> CatRecordCells { get; set; } = new List<CatRecordCell>();
     }
 }

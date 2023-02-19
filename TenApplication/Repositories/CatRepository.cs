@@ -12,17 +12,17 @@ namespace TenApplication.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<List<CatRecordDto>> GetAll(int userId)
+        public async Task<List<CatDto>> GetAll(int userId)
         {
-            return await _applicationDbContext.CatRecords
-                .Include(rec => rec.Cat)
-                .Where(u => u.Cat!.UserId == userId)
-                .OrderBy(c => c.Created)
-                .Select(c => new CatRecordDto()
+            return await _applicationDbContext.Cats
+                .Where(c => c.UserId == userId)
+                .AsNoTracking()
+                .OrderBy(r => r.CatDate)
+                .Select(c => new CatDto()
                 {
-                    Created = c.Created,
+                    CatId= c.CatId,
+                    CatDate= c.CatDate
                 })
-                .AsNoTracking()               
                 .ToListAsync();
         }
 
@@ -31,28 +31,36 @@ namespace TenApplication.Repositories
             CatDto? cat = await _applicationDbContext.Cats
                 .Include(d => d.Designer)
                 .Include(rec => rec.CatRecords)
-                .ThenInclude(i => i.InboxItem)
-                .ThenInclude(j => j.Job)
+                    .ThenInclude(i => i.InboxItem)
+                        .ThenInclude(j => j.Job)
+                .Include(rec => rec.CatRecords)
+                    .ThenInclude(i => i.CatRecordCells)
                 .Where(u => u.CatId == catId)
                 .Select(c => new CatDto()
                 {
                     CatId = c.CatId,
-                    CCtr = c.Designer!.CCtr,
-                    ActTyp = c.Designer.ActTyp,
                     CatRecords = c.CatRecords.Select(c => new CatRecordDto()
                     {
                         CatRecordId = c.CatRecordId,
-                        CellHours = c.CellHours,
-                        Created = c.Created,
-                        Region = c.InboxItem.Job!.Region,
+                        Region = c.InboxItem!.Job!.Region,
+                        CCtr = c.InboxItem.Inbox.Designer.CCtr,
+                        ActTyp = c.InboxItem.Inbox.Designer.ActTyp,
                         ProjectNumber = c.InboxItem.Job.ProjectNumber,
                         ProjectName = c.InboxItem.Job.ProjectName,
                         SapText = c.InboxItem.Job.SapText,
-                        Receiver = c.InboxItem.Job.Receiver
+                        Receiver = c.InboxItem.Job.Receiver,
+                        CatRecordCells = c.CatRecordCells.Select(c => new CatRecordCellDto()
+                        {
+                            CatRecordCellId = c.CatRecordCellId,
+                            CellHours = c.CellHours,
+                            CatRecordCellDate= c.CatRecordCellDate,
+                        }).OrderBy(c => c.CatRecordCellDate).ToList()
                     }).ToList()
                 })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
+
+            if (cat is null) throw new BadHttpRequestException("Cat do not exist !");
 
             return cat;
         }

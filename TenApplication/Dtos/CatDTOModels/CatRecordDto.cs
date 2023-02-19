@@ -1,19 +1,20 @@
+using TenApplication.Dtos.InboxDTO;
 using TenApplication.Models;
+using TenApplication.Models.CatModels;
 
 namespace TenApplication.Dtos.CatDTOModels
 {
     public class CatRecordDto
     {
-        public int CatRecordId { get; set; }    
+        public int CatRecordId { get; set; }
 
-        public double? CellHours { get; set; }
-
-        public DateTime? Created { get; set; }   
-   
         //RELATIONS  
+        public string? CCtr { get; set; }
+        public string? ActTyp { get; set; }
         public Region? Region { get; set; }
         public string? ProjectNumber { get; set; }
-        public string? ProjectName { get; set; }      
+        public string? ProjectName { get; set; }
+        public List<CatRecordCellDto> CatRecordCells { get; set; } = new List<CatRecordCellDto>();
         public string? SapText 
         {
             get

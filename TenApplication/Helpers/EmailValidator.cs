@@ -31,7 +31,7 @@ namespace TenApplication.Helpers
 
             if (m.Success is false) return new ValidationResult(GetErrorMessage3());
 
-            ApplicationDbContext context = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext));
+            ApplicationDbContext context = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext))!;
 
             if (context!.Designers.Any(e => e.Equals(value))) return new ValidationResult(GetErrorMessage(inputValue));
 

@@ -1,6 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 using TenApplication.Helpers;
+using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Models
 {

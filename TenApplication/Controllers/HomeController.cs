@@ -1,31 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using TenApplication.ActionFilters;
 using TenApplication.Dtos;
 using TenApplication.Helpers;
-using TenApplication.Models;
 using TenApplication.Repositories;
 using TenApplication.Dtos.JobDTOModels;
-using TenApplication.Dtos.InboxDTO;
-using System.Security.Claims;
 
 namespace TenApplication.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IJobRepository _jobRepository;
-        private readonly IInboxRepository _inboxRepository;
         private readonly ILogger<HomeController> _logger;
         private readonly IDistributedCache _cache;
 
-        public HomeController(ILogger<HomeController> logger, IJobRepository jobRepository, IDistributedCache cache, IInboxRepository inboxRepository)
+        public HomeController(
+            ILogger<HomeController> logger, 
+            IJobRepository jobRepository, 
+            IDistributedCache cache
+            )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _jobRepository = jobRepository ?? throw new ArgumentNullException(nameof(jobRepository));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _inboxRepository = inboxRepository ?? throw new ArgumentNullException(nameof(inboxRepository));
         }
 
         [HttpGet]

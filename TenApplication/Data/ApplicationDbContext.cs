@@ -25,11 +25,6 @@ namespace TenApplication.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<RaportRecord>()
-            .Property(b => b.RaportCreateDate).ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<CatRecord>()
-            .Property(b => b.Created).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<Job>()
             .Property(b => b.Received).ValueGeneratedOnAdd();
@@ -62,7 +57,7 @@ namespace TenApplication.Data
                 .Property(g => g.Region)
                 .HasConversion(
                     v => v.ToString(),
-                    v => (Region)Enum.Parse(typeof(Region), v));
+                    v => (Region)Enum.Parse(typeof(Region), v!));
 
             modelBuilder.Entity<Job>()
                 .Property(g => g.Software)
