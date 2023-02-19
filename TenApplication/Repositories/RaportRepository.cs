@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
 using TenApplication.Dtos.RaportDTOModels;
+using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Repositories
 {
@@ -12,52 +13,50 @@ namespace TenApplication.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<List<RaportRecordDto>> GetAll()
+        public async Task<List<Raport>> GetAll()
         {
-            List<RaportRecordDto>? records = await _applicationDbContext.RaportRecords
+            List<Raport>? raport = await _applicationDbContext.Raports
                 .AsNoTracking()
-                .Select(r => new RaportRecordDto()
-                {
-                    RaportCreateDate= r.RaportCreateDate
-                })
-                .OrderBy(d => d.RaportCreateDate)
+                .OrderBy(r => r.RaportDate)
                 .ToListAsync();
 
-            return records;
+            return raport;
         }
 
-        public async Task<List<RaportRecordDto>> GetById(int CatId)
+        public async Task<RaportDto> GetById(int raportId)
         {
-            List<RaportRecordDto>? records = await _applicationDbContext.RaportRecords
-                .Include(i => i.InboxItem)
-                    .ThenInclude(j => j.Job)
-                .Include(i => i.InboxItem)
-                    .ThenInclude(i => i.Inbox)
-                        .ThenInclude(d => d.Designer)
-                .Include(i => i.InboxItem)
-                    .ThenInclude(i => i.CatRecords)
-                    .Select(r => new RaportRecordDto(){
-                        RaportCreateDate = r.RaportCreateDate,
-                        RaportRecordHours = r.InboxItem!.CatRecords.Sum(h => h.CellHours),
-         
-                            RaportRecordId = r.RaportRecordId,
-                            Components = r.InboxItem.Components,
-                            DrawingsComponents = r.InboxItem.DrawingsComponents,
-                            DrawingsAssembly = r.InboxItem.DrawingsAssembly,
-                            Name = r.InboxItem.Inbox.Designer.Name,
-                            Surname = r.InboxItem.Inbox.Designer.Surname,
-                            Software = r.InboxItem.Job.Software,
-                            Ecm = r.InboxItem.Job.Ecm,
-                            Gpdm = r.InboxItem.Job.Gpdm,
-                            ProjectNumber = r.InboxItem.Job.ProjectNumber,
-                            Client = r.InboxItem.Job.Client,        
-                            DueDate = r.InboxItem.Job.DueDate,
-                            Started = r.InboxItem.Job.Started,
-                            Finished = r.InboxItem.Job.Finished
-            
-                    }).ToListAsync();
+            RaportDto? raport = await _applicationDbContext.Raports
+                .AsSingleQuery()
+                .Include(rec => rec.RaportRecords)
+                    .ThenInclude(i => i.InboxItem)
+                        .ThenInclude(j => j.Job)
+                .Include(rec => rec.RaportRecords)
+                    .ThenInclude(i => i.InboxItem)
+                        .ThenInclude(i => i.Inbox)
+                            .ThenInclude(d => d.Designer)
+                .Select(r => new RaportDto()
+                {
+                    RaportDate = r.RaportDate,
+                    RaportRecords = r.RaportRecords.Select(r => new RaportRecordDto()
+                    {
+                        RaportRecordId = r.RaportRecordId,
+                        Components = r.InboxItem.Components,
+                        DrawingsComponents = r.InboxItem.DrawingsComponents,
+                        DrawingsAssembly = r.InboxItem.DrawingsAssembly,
+                        Name = r.InboxItem.Inbox.Designer.Name,
+                        Surname = r.InboxItem.Inbox.Designer.Surname,
+                        Software = r.InboxItem.Job.Software,
+                        Ecm = r.InboxItem.Job.Ecm,
+                        Gpdm = r.InboxItem.Job.Gpdm,
+                        ProjectNumber = r.InboxItem.Job.ProjectNumber,
+                        Client = r.InboxItem.Job.Client,
+                        DueDate = r.InboxItem.Job.DueDate,
+                        Started = r.InboxItem.Job.Started,
+                        Finished = r.InboxItem.Job.Finished
+                    }).ToList()
+                }).FirstOrDefaultAsync(r => r.RaportId == raportId);
 
-            return records;
+            return raport;
         }
     }
 }

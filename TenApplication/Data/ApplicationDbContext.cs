@@ -1,6 +1,8 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using TenApplication.Models;
+using TenApplication.Models.CatModels;
+using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Data
 {
@@ -11,9 +13,11 @@ namespace TenApplication.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Inbox> Inboxs { get; set; }
         public DbSet<InboxItem> InboxItems { get; set; }
+        public DbSet<Raport> Raports { get; set; }
         public DbSet<RaportRecord> RaportRecords { get; set; }
         public DbSet<Cat> Cats { get; set; }
         public DbSet<CatRecord> CatRecords { get; set; }
+        public DbSet<CatRecordCell> CatRecordCells { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

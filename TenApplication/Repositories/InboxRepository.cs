@@ -2,6 +2,8 @@
 using TenApplication.Data;
 using TenApplication.Dtos.InboxDTO;
 using TenApplication.Models;
+using TenApplication.Models.CatModels;
+using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Repositories
 {
@@ -88,27 +90,30 @@ namespace TenApplication.Repositories
         {           
             Cat? userCat = await _applicationDbContext.Cats
             .Include(rec => rec.CatRecords)
+                .ThenInclude(c => c.CatRecordCells)
             .FirstOrDefaultAsync(
                 c => c.UserId == userId && 
-                c.CatRecords.Any(rec => rec.Created == entryDate));
+                c.CatDate == entryDate);
 
-            CatRecord newCatRecord = new()
-             { 
-                CellHours = hours,
-                Created = entryDate,   
-                InboxItemId = inboxItemId   
-             };
-
-            if(userCat is null) {
+            if(userCat is null)
+            {
                 userCat = new Cat()
                 {
+                    CatDate = entryDate,
                     UserId = userId,
                     CatRecords = new List<CatRecord>()
-                    {
-                        newCatRecord
-                    }
                 };
-                await _applicationDbContext.Cats.AddAsync(userCat);                    
+                await _applicationDbContext.Cats.AddAsync(userCat);
+            }
+
+            if(!userCat.CatRecords.Any(i => i.InboxItemId == inboxItemId)) {
+                CatRecord newRecord = new()
+                { 
+                    CatId=userCat.CatId,
+                    InboxItemId=inboxItemId,
+                    CatRecordCells = new List<CatRecordCell>()
+                };
+                await _applicationDbContext.CatRecords.AddAsync(newRecord);                    
             }
             else
             {              
