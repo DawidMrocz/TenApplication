@@ -140,5 +140,24 @@ namespace TenApplication.Repositories
         {
             await _applicationDbContext.Jobs.Where(p => p.JobId == id).ExecuteDeleteAsync();
         }
+
+
+        //WRITE FUNCTION TO ADD TO INBOX ! 
+        public async Task AddToInbox(int jobId, int userId)
+        {
+
+            Inbox? inbox = await _applicationDbContext.Inboxs. ...
+            InboxItem newInboxItem = new()
+            {
+                Hours = 0,
+                Components = 0,
+                DrawingsComponents = 0,
+                DrawingsAssembly = 0,
+                JobId = jobId,
+                InboxId = inboxId,
+            };
+            await _applicationDbContext.InboxItems.AddAsync(newInboxItem);
+            await _applicationDbContext.SaveChangesAsync();
+        }
     }
 }

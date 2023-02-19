@@ -6,9 +6,14 @@ using TenApplication.Dtos;
 using TenApplication.Helpers;
 using TenApplication.Repositories;
 using TenApplication.Dtos.JobDTOModels;
+using Microsoft.AspNetCore.Authorization;
+using TenApplication.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace TenApplication.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IJobRepository _jobRepository;
@@ -69,76 +74,76 @@ namespace TenApplication.Controllers
             }
         }
 
-    //    [HttpPost(Name = "Create")]
-    //    [ValidationFilter(DTOName = "job")]
-    //    public async Task<IActionResult> Create([FromBody][Bind(include:"Name,Surname,BirthDate,Gender,CarLicense")] Job job)
-    //    {
-    //        try
-    //        {
-    //            await _jobRepository.Create(job);
-    //            await _cache.DeleteRecordAsync<JobDto>($"job_{job.JobId}");
-    //            await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
-    //            return Ok();
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            _logger.LogError(ex.Message, ex);
-    //            return NotFound("Server error!");
-    //        }
-    //    }
+        [HttpPost(Name = "Create")]
+        [ValidationFilter(DTOName = "job")]
+        public async Task<IActionResult> Create([FromBody][Bind(include: "Name,Surname,BirthDate,Gender,CarLicense")] Job job)
+        {
+            try
+            {
+                await _jobRepository.Create(job);
+                await _cache.DeleteRecordAsync<JobDto>($"job_{job.JobId}");
+                await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                return NotFound("Server error!");
+            }
+        }
 
-    //    [HttpPut(Name = "Update")]
-    //    [Route("/job/{id}")]
-    //    [ValidateAntiForgeryToken]
-    //    [ValidationFilter(DTOName="job")]
-    //    public async Task<IActionResult> Update([FromBody][Bind(include:"Name,Surname,BirthDate,Gender,CarLicense")] Job job)
-    //    {
-    //        try
-    //        {
-    //                await _jobRepository.Update(job);
-    //                await _cache.DeleteRecordAsync<JobDto>($"job_{job.JobId}");
-    //                await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
-    //                return Ok();
-    //        }
-    //        catch (DbUpdateException ex )
-    //        {
-    //            _logger.LogError(ex.Message, ex);
-    //            ModelState.AddModelError("", "Unable to save changes. " +
-    //                "Try again, and if the problem persists " +
-    //                "see your system administrator.");
-    //            return BadRequest("Server error!");
-    //        }
-    //    }
+        [HttpPut(Name = "Update")]
+        [Route("/job/{id}")]
+        [ValidateAntiForgeryToken]
+        [ValidationFilter(DTOName = "job")]
+        public async Task<IActionResult> Update([FromBody][Bind(include: "Name,Surname,BirthDate,Gender,CarLicense")] Job job)
+        {
+            try
+            {
+                await _jobRepository.Update(job);
+                await _cache.DeleteRecordAsync<JobDto>($"job_{job.JobId}");
+                await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
+                return Ok();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+                return BadRequest("Server error!");
+            }
+        }
 
-    //    [HttpDelete(Name = "Delete")]
-    //    [Route("/job/{id}")]
-    //    [IdProvidedValidation(IdName = "jobId")]
-    //    public async Task<IActionResult> Delete([FromRoute] int jobId)
-    //    {
-    //        try
-    //        {
-    //            await _jobRepository.Delete(jobId);
-    //            await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
-    //            await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
-    //            return Ok();
-    //        }
-    //        catch (DbUpdateException ex )
-    //        {
-    //            _logger.LogError(ex.Message, ex);
-    //            ModelState.AddModelError("", "Unable to save changes. " +
-    //                "Try again, and if the problem persists " +
-    //                "see your system administrator.");
-    //            return BadRequest("Server error!");
-    //        }
-    //    }
+        [HttpDelete(Name = "Delete")]
+        [Route("/job/{id}")]
+        [IdProvidedValidation(IdName = "jobId")]
+        public async Task<IActionResult> Delete([FromRoute] int jobId)
+        {
+            try
+            {
+                await _jobRepository.Delete(jobId);
+                await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
+                await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
+                return Ok();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+                return BadRequest("Server error!");
+            }
+        }
 
-    //    [HttpGet]
-    //    [IdProvidedValidation(IdName = "jobId")]
-    //    public async Task<ActionResult<InboxItemDto>> CreateInboxItem([FromRoute] int jobId)
-    //    {
-    //        var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
-    //        await _inboxRepository.CreateInboxItem(jobId,authenticatedId);
-    //        return RedirectToAction("Index", "Home");
-    //    }
+        [HttpPost]
+        [IdProvidedValidation(IdName = "jobId")]
+        public async Task<ActionResult> CreateInboxItem([FromRoute] int jobId)
+        {
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            await _inboxRepository.CreateInboxItem(jobId, authenticatedId);
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

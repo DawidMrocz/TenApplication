@@ -11,5 +11,6 @@ namespace TenApplication.Repositories
         public Task Create(Job product);
         public Task Update(Job product);
         public Task Delete(int id);
+        public Task AddToInbox(int jobId, int userId);
     }
 }

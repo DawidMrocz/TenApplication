@@ -49,22 +49,7 @@ namespace TenApplication.Repositories
                 })
                 .OrderBy(j => j.InboxItems!.Select(j => j.DueDate))
                 .SingleAsync(i => i.UserId == userId);
-        }       
-
-        public async Task CreateInboxItem(int jobId,int inboxId)
-        {
-            InboxItem newInboxItem = new()
-            {
-                Hours = 0,
-                Components = 0,
-                DrawingsComponents = 0,
-                DrawingsAssembly = 0,
-                JobId = jobId,
-                InboxId = inboxId,
-            };
-            await _applicationDbContext.InboxItems.AddAsync(newInboxItem);
-            await _applicationDbContext.SaveChangesAsync();
-        }
+        }            
 
         public async Task UpdateInboxItem(UpdateInboxItemDto inboxItem,int inboxItemId)
         {
