@@ -71,6 +71,8 @@ namespace TenApplication.Repositories
                     TennecoStartDate = d.TennecoStartDate
                 }).SingleAsync(p => p.UserId == UserId);
 
+                if(profile is null) throw new BadHttpRequestException("Profile do not exist!");
+
                 await _cache.SetRecordAsync($"Profile_{UserId}", profile);
             }
             return profile;

@@ -145,8 +145,10 @@ namespace TenApplication.Repositories
         //WRITE FUNCTION TO ADD TO INBOX ! 
         public async Task AddToInbox(int jobId, int userId)
         {
+            Inbox? inbox = await _applicationDbContext.Inboxs.FirstOrDefaultAsync(i => i.UserId == userId);
 
-            Inbox? inbox = await _applicationDbContext.Inboxs. ...
+            if(inbox is null) throw new BadRequetException("Inbox do not exist!");
+
             InboxItem newInboxItem = new()
             {
                 Hours = 0,
@@ -154,8 +156,9 @@ namespace TenApplication.Repositories
                 DrawingsComponents = 0,
                 DrawingsAssembly = 0,
                 JobId = jobId,
-                InboxId = inboxId,
+                InboxId = inbox.InboxId,
             };
+
             await _applicationDbContext.InboxItems.AddAsync(newInboxItem);
             await _applicationDbContext.SaveChangesAsync();
         }

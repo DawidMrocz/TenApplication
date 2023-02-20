@@ -16,7 +16,7 @@ namespace TenApplication.Repositories
         }
         public async Task<InboxDto> GetInbox(int userId)
         {
-            return await _applicationDbContext.Inboxs
+            InboxDto? inbox = await _applicationDbContext.Inboxs
                 .AsNoTracking()
                 .Include(d => d.Designer)
                 .Include(i => i.InboxItems!)
@@ -48,7 +48,11 @@ namespace TenApplication.Repositories
                     }).ToList()
                 })
                 .OrderBy(j => j.InboxItems!.Select(j => j.DueDate))
-                .SingleAsync(i => i.UserId == userId);
+                .FirstOrDefaultAsync(i => i.UserId == userId);
+
+                if(inbox is null) throw new BadHttpRequestException("Inbox do not exist!");
+
+                return inbox;
         }            
 
         public async Task UpdateInboxItem(UpdateInboxItemDto inboxItem,int inboxItemId)

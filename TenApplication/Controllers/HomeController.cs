@@ -141,9 +141,23 @@ namespace TenApplication.Controllers
         [IdProvidedValidation(IdName = "jobId")]
         public async Task<ActionResult> CreateInboxItem([FromRoute] int jobId)
         {
-            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value);
-            await _inboxRepository.CreateInboxItem(jobId, authenticatedId);
-            return RedirectToAction("Index", "Home");
+            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            
+            try
+            {
+                await _jobRepository.AddToInbox(jobId, authenticatedId);
+                await _cache.DeleteRecordAsync<JobDto>($"job_{jobId}");
+                await _cache.DeleteRecordAsync<PaginatedList<JobDto>>(JsonConvert.SerializeObject(new QueryParams()));
+                return RedirectToAction("Index", "Home");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+                return BadRequest("Server error!");
+            }  
         }
     }
 }
