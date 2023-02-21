@@ -5,11 +5,10 @@ using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Dtos.DesignerDTOModels
 {
-    public class DesignerDto
+    public class UserDto
     {
         public int UserId { get; set; }
-        public string? Name { get; set; }
-        public string? Surname { get; set; }
+        public string? UserName { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }       
         public string? CCtr { get; set; }
@@ -21,13 +20,6 @@ namespace TenApplication.Dtos.DesignerDTOModels
         public List<InboxItemDto>? InboxItems { get; set; }
         public List<Cat>? Cats { get; set; }
         public List<RaportRecord>? RaportRecords { get; set; }
-        public string DisplayName
-        {
-            get
-            {
-                return $"{Name} {Surname}";
-            }
-        }
         public double Experience
         {
             get

@@ -43,8 +43,8 @@ namespace TenApplication.Repositories
                     {
                         CatRecordId = c.CatRecordId,
                         Region = c.InboxItem!.Job!.Region,
-                        CCtr = c.InboxItem.Inbox.Designer.CCtr,
-                        ActTyp = c.InboxItem.Inbox.Designer.ActTyp,
+                        CCtr = c.InboxItem.Inbox.User.CCtr,
+                        ActTyp = c.InboxItem.Inbox.User.ActTyp,
                         ProjectNumber = c.InboxItem.Job.ProjectNumber,
                         ProjectName = c.InboxItem.Job.ProjectName,
                         SapText = c.InboxItem.Job.SapText,

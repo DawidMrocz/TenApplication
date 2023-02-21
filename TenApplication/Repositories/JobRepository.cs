@@ -91,7 +91,7 @@ namespace TenApplication.Repositories
                     DueDate = p.DueDate,
                     Started = p.Started,
                     Finished = p.Finished,
-                    Designers = p.InboxItems!.Select(i => new DesignerDto()
+                    Designers = p.InboxItems!.Select(i => new UserDto()
                     {
                         Name = i.Inbox!.Designer.Name,
                         Surname = i.Inbox!.Designer.Surname,

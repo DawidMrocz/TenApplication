@@ -1,6 +1,5 @@
-﻿
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using TenApplication.Helpers;
 using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Models
@@ -11,53 +10,15 @@ namespace TenApplication.Models
         Engineer,
         Senior_Engineer,
     }
-    public enum UserRole
+    
+    public class User : IdentityUser<Guid>, IValidatableObject
     {
-        Designer,
-        Leader,     
-        Admin,
-    }
-    public enum Client
-    {
-        Stellantis,
-        Ford,
-        Toyota,
-        GM,
-        Daimler,
-    }
-    public abstract class User
-    {
-        public int UserId { get; set; }
-        [NameValidator(50)]
-        public required string Name { get; set; }
-        [NameValidator(50)]
-        public required string Surname { get; set; }
-        [EmailValidator(50)]
-        [DataType(DataType.EmailAddress)]
-        public required string Email { get; set; }
-        [Phone(ErrorMessage = "Wprowadz poprawny format numeru telefonu!")]
-        public string? Phone { get; set; }
-        public string DisplayName
-        {
-            get
-            {
-                return $"{Name} {Surname}";
-            }
-        }      
-    }
-
-    public class Designer : User, IValidatableObject
-    {
-        public string? PasswordHash { get; set; }     
         [Required(ErrorMessage = "Pole ActTyp nie może być puste!")]
         [RegularExpression("/[A-Z]{2}[0-9]{4}/g", ErrorMessage = "Wporowadź poprawny format cctr!")]
         public required string CCtr { get; set; }
         [Required(ErrorMessage = "Pole ActTyp nie może być puste!")]
         [RegularExpression("/[A-Z]{1}[0-9]{4}/g", ErrorMessage = "Wporowadź poprawny format acttyp!")]
         public required string ActTyp { get; set; }
-        [Required]
-        [EnumDataType(typeof(UserRole))]
-        public required UserRole UserRole { get; set; }
         [Required]
         [EnumDataType(typeof(Level))]
         public required Level Level { get; set; }
@@ -89,9 +50,5 @@ namespace TenApplication.Models
                     new[] { nameof(TennecoStartDate) });
             }
         }
-    }
-    public class Engineer:User
-    {
-        public Client Client { get; set; }
-    }  
+    } 
 }

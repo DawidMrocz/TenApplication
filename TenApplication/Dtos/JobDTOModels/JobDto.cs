@@ -13,7 +13,7 @@ namespace TenApplication.Dtos.JobDTOModels
         public Software? Software { get; set; }
         public string? Link { get; set; }
         public string? EngineerName { get; set; }
-        public List<DesignerDto>? Designers { get; set; }
+        public List<UserDto>? Designers { get; set; }
         public int? Ecm { get; set; }
         public int? Gpdm { get; set; }
         public Region? Region { get; set; }

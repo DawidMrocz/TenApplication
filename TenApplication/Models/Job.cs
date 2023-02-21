@@ -1,6 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TenApplication.Models
 {
@@ -22,9 +20,16 @@ namespace TenApplication.Models
         IN,
         RYB,
     }
-    public class Job
+    public enum Client
     {
-        
+        Stellantis,
+        Ford,
+        Toyota,
+        GM,
+        Daimler,
+    }
+    public class Job
+    {  
         public int JobId { get; set; }
         [StringLength(100,ErrorMessage="Description is to long!")]
         public string? JobDescription { get; set; }
@@ -34,8 +39,7 @@ namespace TenApplication.Models
         public required Software Software { get; set; }
         [Url(ErrorMessage ="Input must be url string!")]
         public string? Link { get; set; }
-        public Guid EngineerId { get; set; }
-        public Engineer? Engineer { get; set; }
+        public string? Engineer { get; set; }
         [Required]
         [Range(3000000, 4000000, ErrorMessage = "Ecm number out of range!")]
         public required int Ecm { get; set; }

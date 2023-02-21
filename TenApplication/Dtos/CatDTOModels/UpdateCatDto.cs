@@ -14,7 +14,7 @@ namespace TenApplication.Dtos.CatDTOModels
 
         //RELATIONS
         public int UserId { get; set; }
-        public Designer? Designer { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
         public List<CatRecord>? CatRecords { get; set; }
     }
 }

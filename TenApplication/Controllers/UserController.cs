@@ -4,28 +4,28 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TenApplication.Repositories;
 using System.Security.Claims;
-using TenApplication.Models;
-using TenApplication.Dtos.DesignerDTOModels;
 using TenApplication.Dtos;
+using TenApplication.Dtos.DesignerDTOModels;
+using TenApplication.Models;
 
 namespace TenApplication.Controllers
 {
     [Authorize]
-    public class DesignerController : Controller
+    public class UserController : Controller
     {
-        private readonly IDesignerRepository _DesignerRepository;
+        private readonly IUserRepository _UserRepository;
 
-        public DesignerController(IDesignerRepository DesignerRepository)
+        public UserController(IUserRepository UserRepository)
         {
-            _DesignerRepository = DesignerRepository ?? throw new ArgumentNullException(nameof(DesignerRepository));
+            _UserRepository = UserRepository ?? throw new ArgumentNullException(nameof(UserRepository));
         }
 
         [HttpGet]
-        public async Task<ActionResult<DesignerDto>> Profile()
+        public async Task<ActionResult<UserDto>> Profile()
         {
             try
             {
-                DesignerDto profile = await _DesignerRepository.GetProfile(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+                UserDto profile = await _UserRepository.GetProfile(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return View(profile);
             }
             catch (Exception ex)
@@ -42,11 +42,11 @@ namespace TenApplication.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<bool>> DeleteDesigner()
+        public async Task<ActionResult<bool>> DeleteUser()
         {
             try
             {
-                bool profileDeleted = await _DesignerRepository.DeleteDesigner(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+                bool profileDeleted = await _UserRepository.DeleteUser(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return profileDeleted;
             }
             catch (Exception ex)
@@ -56,13 +56,13 @@ namespace TenApplication.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<Designer>> UpdateDesigner([FromBody] UpdateDto updateDesigner, [FromRoute]int userId)
+        public async Task<ActionResult<ApplicationUser>> UpdateUser([FromBody] UpdateDto updateUser, [FromRoute]int userId)
         {
-            var DesignerId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var UserId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
-                Designer newDesigner = await _DesignerRepository.UpdateDesigner(updateDesigner,userId);
-                return Ok(newDesigner);
+                ApplicationUser newUser = await _UserRepository.UpdateUser(updateUser,userId);
+                return Ok(newUser);
             }
             catch (Exception ex)
             {

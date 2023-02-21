@@ -1,6 +1,8 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using TenApplication.Data;
 using TenApplication.Models;
 using TenApplication.Repositories;
@@ -16,69 +18,58 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
-
-// For Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// Adding Authentication
-builder.Services.AddAuthentication(options =>
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 4;
+    options.Password.RequiredUniqueChars = 0;
+
+    //USER
+    options.User.RequireUniqueEmail = true;
+    options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+
+    //LOCKOUT
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(60);
+    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.AllowedForNewUsers = true;
+
+    //SIGN IN
+    options.SignIn.RequireConfirmedEmail = false;
+
 })
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
+.AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>()
+.AddDefaultUI();
 
-// Adding Jwt Bearer
-.AddJwtBearer(options =>
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = configuration["JWT:ValidAudience"],
-        ValidIssuer = configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
-    };
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(60);
+
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.SlidingExpiration = true;
+
 });
 
-// builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-//     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Admin", "User"));
+    options.AddPolicy("Sex", policy => policy.RequireClaim("Gender", "Man"));
 
-// builder.Services.Configure<IdentityOptions>(options =>
-// {
-//     // Password settings.
-//     options.Password.RequireDigit = true;
-//     options.Password.RequireLowercase = true;
-//     options.Password.RequireNonAlphanumeric = true;
-//     options.Password.RequireUppercase = true;
-//     options.Password.RequiredLength = 6;
-//     options.Password.RequiredUniqueChars = 1;
+    //options.AddPolicy("UserPolicy", policyBuilder =>
+    //{
+    //    policyBuilder.UserRequireCustomClaim(ClaimTypes.Name);
+    //});
+});
 
-//     // Lockout settings.
-//     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-//     options.Lockout.MaxFailedAccessAttempts = 5;
-//     options.Lockout.AllowedForNewUsers = true;
-
-//     // User settings.
-//     options.User.AllowedUserNameCharacters =
-//     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-//     options.User.RequireUniqueEmail = false;
-// });
-
-// builder.Services.ConfigureApplicationCookie(options =>
-// {
-//     // Cookie settings
-//     options.Cookie.HttpOnly = true;
-//     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-//     options.LoginPath = "/Identity/Account/Login";
-//     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-//     options.SlidingExpiration = true;
-// });
+//builder.Services.AddScoped<IAuthorizationHandler, PoliciesAuthorizationHandler>();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -86,20 +77,13 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "SampleInstance";
 });
 
-//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//    .AddCookie(option =>
-//    {
-//        option.LoginPath = "/Access/Login";
-//        option.ExpireTimeSpan = TimeSpan.FromMinutes(20);
-//    });
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IPasswordHasher<Designer>, PasswordHasher<Designer>>();
+//builder.Services.AddHttpContextAccessor();
+//builder.Services.AddScoped<IPasswordHasher<Designer>, PasswordHasher<Designer>>();
 
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ICatRepository, CatRepository>();
 builder.Services.AddScoped<IRaportRepository, RaportRepository>();
-builder.Services.AddScoped<IDesignerRepository, DesignerRepository>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInboxRepository, InboxRepository>();
 
 builder.Services.AddControllersWithViews();

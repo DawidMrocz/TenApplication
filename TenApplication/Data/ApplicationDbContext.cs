@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TenApplication.Models;
 using TenApplication.Models.CatModels;
@@ -6,10 +6,9 @@ using TenApplication.Models.RaportModels;
 
 namespace TenApplication.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<User, ApplicationRole, Guid>
     {
-        public DbSet<Designer> Designers { get; set; }
-        public DbSet<Engineer> Engineers { get; set; }
+        //public DbSet<User> Users { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Inbox> Inboxs { get; set; }
         public DbSet<InboxItem> InboxItems { get; set; }
@@ -26,26 +25,24 @@ namespace TenApplication.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<Job>()
-            .Property(b => b.Received).ValueGeneratedOnAdd();
+            modelBuilder.Entity<User>(b =>
+            {
+                b.Property(u => u.Id).HasDefaultValueSql("newsequentialid()");
+            });
 
-            modelBuilder.Entity<Designer>()
+            modelBuilder.Entity<ApplicationRole>(b =>
+            {
+                b.Property(u => u.Id).HasDefaultValueSql("newsequentialid()");
+            });
+
+            modelBuilder.Entity<User>()
                 .Property(g => g.Level)
                 .HasConversion(
                     v => v.ToString(),
                     v => (Level)Enum.Parse(typeof(Level), v));
 
-            modelBuilder.Entity<Designer>()
-                .Property(g => g.UserRole)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (UserRole)Enum.Parse(typeof(UserRole), v));
-
-            modelBuilder.Entity<Engineer>()
-                .Property(g => g.Client)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (Client)Enum.Parse(typeof(Client), v));
+            modelBuilder.Entity<Job>()
+            .Property(b => b.Received).ValueGeneratedOnAdd();
 
             modelBuilder.Entity<Job>()
                 .Property(g => g.TaskType)
@@ -65,7 +62,7 @@ namespace TenApplication.Data
                     v => v.ToString(),
                     v => (Software)Enum.Parse(typeof(Software), v));
 
-            //new DbInitializer(modelBuilder).Seed();
+            new DbInitializer(modelBuilder).Seed();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
