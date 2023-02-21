@@ -6,6 +6,6 @@ namespace TenApplication.Dtos.CatDTOModels
     {
         public double CatRecordHours { get; set; }
         public DateTime CatRecordCreated { get; set; }
-        public int CatId { get; set; }
+        public Guid CatId { get; set; }
     }
 }

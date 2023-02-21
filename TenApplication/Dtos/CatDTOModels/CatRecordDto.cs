@@ -6,7 +6,7 @@ namespace TenApplication.Dtos.CatDTOModels
 {
     public class CatRecordDto
     {
-        public int CatRecordId { get; set; }
+        public Guid CatRecordId { get; set; }
 
         //RELATIONS  
         public string? CCtr { get; set; }

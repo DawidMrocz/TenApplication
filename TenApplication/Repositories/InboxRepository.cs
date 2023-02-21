@@ -14,11 +14,11 @@ namespace TenApplication.Repositories
         {
             _applicationDbContext = applicationDbContext;
         }
-        public async Task<InboxDto> GetInbox(int userId)
+        public async Task<InboxDto> GetInbox(Guid userId)
         {
             InboxDto? inbox = await _applicationDbContext.Inboxs
                 .AsNoTracking()
-                .Include(d => d.Designer)
+                .Include(d => d.User)
                 .Include(i => i.InboxItems!)
                 .ThenInclude(j => j.Job)
                 .Select(i => new InboxDto()
@@ -26,10 +26,9 @@ namespace TenApplication.Repositories
                     InboxId = i.InboxId,
                     TaskQuantity = i.InboxItems!.Count(),
                     AllHours = i.InboxItems!.Sum(h => h.Hours),
-                    UserId = i.Designer.UserId,
-                    Name = i.Designer.Name,
-                    Surname = i.Designer.Surname,
-                    Photo = i.Designer.Photo,
+                    UserId = i.User.Id,
+                    UserName = i.User.UserName,
+                    Photo = i.User.Photo,
                     InboxItems = i.InboxItems!.Select(i => new InboxItemDto()
                     {
                         InboxItemId = i.InboxItemId,
@@ -55,7 +54,7 @@ namespace TenApplication.Repositories
                 return inbox;
         }            
 
-        public async Task UpdateInboxItem(UpdateInboxItemDto inboxItem,int inboxItemId)
+        public async Task UpdateInboxItem(UpdateInboxItemDto inboxItem,Guid inboxItemId)
         {
             await _applicationDbContext.InboxItems.Include(j => j.Job)
                 .Where(p => p.InboxItemId == inboxItemId)
@@ -70,12 +69,12 @@ namespace TenApplication.Repositories
                     );
         }
 
-        public async Task DeleteInboxItem(int inboxItemId)
+        public async Task DeleteInboxItem(Guid inboxItemId)
         {
             await _applicationDbContext.InboxItems.Where(p => p.InboxItemId == inboxItemId).ExecuteDeleteAsync();
         }
 
-        public async Task SendHours(int inboxItemId, int userId, DateTime entryDate, double hours)
+        public async Task SendHours(Guid inboxItemId, Guid userId, DateTime entryDate, double hours)
         {
             Cat? userCat = await _applicationDbContext.Cats
             .Include(rec => rec.CatRecords)

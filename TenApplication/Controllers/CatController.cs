@@ -29,7 +29,7 @@ namespace TenApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CatDto>>> Index()
         {
-            int authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            Guid authenticatedId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
                 string key = $"Cat_user_{authenticatedId}";
@@ -49,9 +49,9 @@ namespace TenApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CatDto>> Details(int id)
+        public async Task<ActionResult<CatDto>> Details(Guid id)
         {
-            int authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            Guid authenticatedId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
                 string key = $"Cat_user_{authenticatedId}";

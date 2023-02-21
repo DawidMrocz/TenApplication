@@ -5,7 +5,7 @@ namespace TenApplication.Dtos.CatDTOModels
 {
     public class UpdateCatDto
     {
-        public int CatId { get; set; }
+        public Guid CatId { get; set; }
         [DataType(DataType.Date)]
         public DateTime CatCreateDate { get; set; }
         [Range(0, 1000, ErrorMessage = "Value out of range!")]
@@ -13,8 +13,8 @@ namespace TenApplication.Dtos.CatDTOModels
         public int QuantityOfRecords { get; set; }
 
         //RELATIONS
-        public int UserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public Guid UserId { get; set; }
+        public User? ApplicationUser { get; set; }
         public List<CatRecord>? CatRecords { get; set; }
     }
 }

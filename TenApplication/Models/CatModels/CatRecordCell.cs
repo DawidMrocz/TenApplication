@@ -5,7 +5,7 @@ namespace TenApplication.Models.CatModels
 {
     public class CatRecordCell
     {
-        public int CatRecordCellId { get; set; }
+        public Guid CatRecordCellId { get; set; }
 
         [Precision(2)]
         [Range(0, 500, ErrorMessage = "Hours number out of range!")]
@@ -16,7 +16,7 @@ namespace TenApplication.Models.CatModels
         public DateTime CatRecordCellDate { get; set; }
 
         //RELATIONS
-        public int CatRecordId { get; set; }
+        public Guid CatRecordId { get; set; }
         public CatRecord CatRecord { get; set; } = null!;
     }
 }

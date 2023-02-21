@@ -8,7 +8,7 @@ namespace TenApplication.Data
 {
     public class ApplicationDbContext : IdentityDbContext<User, ApplicationRole, Guid>
     {
-        //public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Inbox> Inboxs { get; set; }
         public DbSet<InboxItem> InboxItems { get; set; }
@@ -24,6 +24,7 @@ namespace TenApplication.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>(b =>
             {

@@ -93,7 +93,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpPut(Name = "Update")]
-        [Route("/job/{id}")]
         [ValidateAntiForgeryToken]
         [ValidationFilter(DTOName = "job")]
         public async Task<IActionResult> Update([FromBody][Bind(include: "Name,Surname,BirthDate,Gender,CarLicense")] Job job)
@@ -116,7 +115,6 @@ namespace TenApplication.Controllers
         }
 
         [HttpDelete(Name = "Delete")]
-        [Route("/job/{id}")]
         [IdProvidedValidation(IdName = "jobId")]
         public async Task<IActionResult> Delete([FromRoute] int jobId)
         {
@@ -141,7 +139,7 @@ namespace TenApplication.Controllers
         [IdProvidedValidation(IdName = "jobId")]
         public async Task<ActionResult> CreateInboxItem([FromRoute] int jobId)
         {
-            var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            var authenticatedId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             
             try
             {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TenApplication.Data;
 using TenApplication.Dtos;
-using TenApplication.Dtos.DesignerDTOModels;
 using TenApplication.Dtos.JobDTOModels;
 using TenApplication.Models;
+using TenApplication.Dtos.DesignerDTOModels;
 
 namespace TenApplication.Repositories
 {
@@ -18,8 +18,7 @@ namespace TenApplication.Repositories
         public async Task<PaginatedList<JobDto>> GetAll(QueryParams queryParams)
         {
             IQueryable<Job> query = _applicationDbContext.Jobs
-                .Include(e => e.Engineer!.DisplayName)
-                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Designer))
+                .Include(i => i.InboxItems!.Select(i => i.Inbox!.User))
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -28,16 +27,15 @@ namespace TenApplication.Repositories
             if (!String.IsNullOrEmpty(queryParams.SearchBy)) query = query.Where(
                     s => s.Received.ToString()!.Contains(queryParams.SearchBy) ||
                     s.DueDate.ToString()!.Contains(queryParams.SearchBy) ||
-                    s.Engineer!.DisplayName.Contains(queryParams.SearchBy) ||
-                    s.InboxItems!.Any(d => d.Inbox!.Designer.Name.Contains(queryParams.SearchBy)) ||
-                    s.InboxItems!.Any(d => d.Inbox!.Designer.Surname.Contains(queryParams.SearchBy))
+                    s.Engineer!.Contains(queryParams.SearchBy) ||
+                    s.InboxItems!.Any(d => d.Inbox!.User.UserName.Contains(queryParams.SearchBy))
                 );
 
             if (queryParams.Ecm is not null) query = query.Where(s => s.Ecm == queryParams.Ecm);
 
             if (queryParams.Client is not null) query = query.Where(s => s.Client == queryParams.Client);
 
-            if (queryParams.Engineer is not null) query = query.Where(s => s.Engineer!.DisplayName == queryParams.Engineer);
+            if (queryParams.Engineer is not null) query = query.Where(s => s.Engineer == queryParams.Engineer);
 
             switch (queryParams.SortBy.ToString())
             {
@@ -57,7 +55,7 @@ namespace TenApplication.Repositories
                 JobId = p.JobId,
                 TaskType = p.TaskType,
                 Software = p.Software,
-                EngineerName = p.Engineer!.DisplayName,
+                EngineerName = p.Engineer,
                 Client = p.Client,
                 Status = p.Status,
                 Received = p.Received,
@@ -70,8 +68,7 @@ namespace TenApplication.Repositories
         public async Task<JobDto> GetById(int? id)
         {
             JobDto? Job = await _applicationDbContext.Jobs
-                .Include(i => i.InboxItems!.Select(i => i.Inbox!.Designer))
-                .Include(e => e.Engineer!.DisplayName)
+                .Include(i => i.InboxItems!.Select(i => i.Inbox!.User))
                 .Select(p => new JobDto()
                 {
                     JobId = p.JobId,
@@ -79,7 +76,6 @@ namespace TenApplication.Repositories
                     TaskType = p.TaskType,
                     Software = p.Software,
                     Link = p.Link,
-                    EngineerName = p.Engineer!.DisplayName,
                     Ecm = p.Ecm,
                     Gpdm = p.Gpdm,
                     Region = p.Region,
@@ -91,14 +87,13 @@ namespace TenApplication.Repositories
                     DueDate = p.DueDate,
                     Started = p.Started,
                     Finished = p.Finished,
-                    Designers = p.InboxItems!.Select(i => new UserDto()
+                    Users = p.InboxItems!.Select(i => new UserDto()
                     {
-                        Name = i.Inbox!.Designer.Name,
-                        Surname = i.Inbox!.Designer.Surname,
-                        Photo = i.Inbox!.Designer.Photo,
-                        Level = i.Inbox!.Designer.Level
+                        UserName = i.Inbox!.User.UserName,
+                        Photo = i.Inbox!.User.Photo,
+                        Level = i.Inbox!.User.Level
 
-                    }).OrderBy(d => d.Name).ToList()
+                    }).OrderBy(d => d.UserName).ToList()
                 })
                 .AsNoTracking()
                 .SingleAsync(p => p.JobId == id);
@@ -121,7 +116,7 @@ namespace TenApplication.Repositories
                     .SetProperty(b => b.TaskType, b => job.TaskType)
                     .SetProperty(b => b.Software, b => job.Software)
                     .SetProperty(b => b.Link, b => job.Link)
-                    .SetProperty(b => b.EngineerId, b => job.EngineerId)
+                    .SetProperty(b => b.Engineer, b => job.Engineer)
                     .SetProperty(b => b.Ecm, b => job.Ecm)
                     .SetProperty(b => b.Gpdm, b => job.Gpdm)
                     .SetProperty(b => b.Region, b => job.Region)
@@ -143,11 +138,11 @@ namespace TenApplication.Repositories
 
 
         //WRITE FUNCTION TO ADD TO INBOX ! 
-        public async Task AddToInbox(int jobId, int userId)
+        public async Task AddToInbox(int jobId, Guid userId)
         {
             Inbox? inbox = await _applicationDbContext.Inboxs.FirstOrDefaultAsync(i => i.UserId == userId);
 
-            if(inbox is null) throw new BadRequetException("Inbox do not exist!");
+            if(inbox is null) throw new BadHttpRequestException("Inbox do not exist!");
 
             InboxItem newInboxItem = new()
             {

@@ -49,9 +49,9 @@ namespace TenAppliRaportion.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<RaportDto>> Details(int id)
+        public async Task<ActionResult<RaportDto>> Details(Guid id)
         {
-            int authentiRaportedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            Guid authentiRaportedId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
                 string key = $"Raport_user_{authentiRaportedId}";

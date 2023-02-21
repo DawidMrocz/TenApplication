@@ -18,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.EnableSensitiveDataLogging();
 });
 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+builder.Services.AddIdentity<User,ApplicationRole>(options =>
 {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
@@ -42,7 +42,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
-.AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
+.AddUserStore<UserStore<User, ApplicationRole, ApplicationDbContext, Guid>>()
 .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>()
 .AddDefaultUI();
 
@@ -52,8 +52,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromSeconds(60);
 
-    options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LoginPath = "/Access/Login";
+    options.AccessDeniedPath = "/Identity/Access/AccessDenied";
     options.SlidingExpiration = true;
 
 });
@@ -83,7 +83,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ICatRepository, CatRepository>();
 builder.Services.AddScoped<IRaportRepository, RaportRepository>();
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInboxRepository, InboxRepository>();
 
 builder.Services.AddControllersWithViews();

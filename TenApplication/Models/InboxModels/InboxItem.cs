@@ -6,7 +6,7 @@ namespace TenApplication.Models
 {
     public class InboxItem
     {
-        public int InboxItemId { get; set; }
+        public Guid InboxItemId { get; set; }
         [Precision(2)]
         [Range(0, 500, ErrorMessage = "Hours number out of range!")]
         public double Hours { get; set; } = 0;
@@ -20,7 +20,7 @@ namespace TenApplication.Models
         //RELATIONS
         public int JobId { get; set; }
         public Job Job { get; set; } = null!;
-        public int InboxId { get; set; }
+        public Guid InboxId { get; set; }
         public Inbox Inbox { get; set; } = null!;
         public List<CatRecord> CatRecords { get; set; } = new List<CatRecord>();
     }

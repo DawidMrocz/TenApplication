@@ -25,7 +25,7 @@ namespace TenApplication.Controllers
         {
             try
             {
-                UserDto profile = await _UserRepository.GetProfile(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+                UserDto profile = await _UserRepository.GetProfile(Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return View(profile);
             }
             catch (Exception ex)
@@ -46,7 +46,7 @@ namespace TenApplication.Controllers
         {
             try
             {
-                bool profileDeleted = await _UserRepository.DeleteUser(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+                bool profileDeleted = await _UserRepository.DeleteUser(Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                 return profileDeleted;
             }
             catch (Exception ex)
@@ -56,12 +56,12 @@ namespace TenApplication.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ApplicationUser>> UpdateUser([FromBody] UpdateDto updateUser, [FromRoute]int userId)
+        public async Task<ActionResult<User>> UpdateUser([FromBody] UpdateDto updateUser, [FromRoute]Guid userId)
         {
             var UserId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
-                ApplicationUser newUser = await _UserRepository.UpdateUser(updateUser,userId);
+                User newUser = await _UserRepository.UpdateUser(updateUser,userId);
                 return Ok(newUser);
             }
             catch (Exception ex)

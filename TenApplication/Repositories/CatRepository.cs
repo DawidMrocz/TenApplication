@@ -12,7 +12,7 @@ namespace TenApplication.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public async Task<List<CatDto>> GetAll(int userId)
+        public async Task<List<CatDto>> GetAll(Guid userId)
         {
             return await _applicationDbContext.Cats
                 .Where(c => c.UserId == userId)
@@ -26,10 +26,10 @@ namespace TenApplication.Repositories
                 .ToListAsync();
         }
 
-        public async Task<CatDto> GetById(int catId)
+        public async Task<CatDto> GetById(Guid catId)
         {
             CatDto? cat = await _applicationDbContext.Cats
-                .Include(d => d.Designer)
+                .Include(d => d.User)
                 .Include(rec => rec.CatRecords)
                     .ThenInclude(i => i.InboxItem)
                         .ThenInclude(j => j.Job)

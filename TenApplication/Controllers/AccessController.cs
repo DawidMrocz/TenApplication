@@ -12,7 +12,7 @@ namespace TenApplication.Controllers
     public class AccessController : Controller
     {
 
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IConfiguration _configuration;
 
@@ -20,7 +20,7 @@ namespace TenApplication.Controllers
         private readonly IHttpContextAccessor _contxt;
 
         public AccessController(
-            UserManager<ApplicationUser> userManager,
+            UserManager<User> userManager,
             RoleManager<ApplicationRole> roleManager,
             IConfiguration configuration,
             IUserRepository userRepository, 
@@ -150,14 +150,14 @@ namespace TenApplication.Controllers
         //    return RedirectToAction("Index", "Home");
         //}
 
-        //[HttpGet]
-        //public async Task<ActionResult> Login()
-        //{
-        //    ClaimsPrincipal claimUser = HttpContext.User;
-        //    if (claimUser.Identity!.IsAuthenticated) return RedirectToAction("Index", "Home");
+        [HttpGet]
+        public async Task<ActionResult> Login()
+        {
+            ClaimsPrincipal claimUser = HttpContext.User;
+            if (claimUser.Identity!.IsAuthenticated) return RedirectToAction("Index", "Home");
 
-        //    return View();
-        //}
+            return View();
+        }
 
         //[HttpPost]
         //public async Task<ActionResult> Register(RegisterDto command)
@@ -174,18 +174,18 @@ namespace TenApplication.Controllers
         //    }
         //}
 
-        //[HttpGet]
-        //public async Task<ActionResult> Register()
-        //{
-        //    try
-        //    {
-        //        return View();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        [HttpGet]
+        public async Task<ActionResult> Register()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
         ////IDENTITY SERVER

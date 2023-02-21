@@ -2,7 +2,7 @@
 {
     public class CatDto
     {
-        public int CatId { get; set; }
+        public Guid CatId { get; set; }
 
         //RELATIONS  
         public DateTime CatDate { get; set; }

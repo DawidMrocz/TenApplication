@@ -33,7 +33,7 @@ namespace TenApplication.Helpers
 
             ApplicationDbContext context = (ApplicationDbContext)validationContext.GetService(typeof(ApplicationDbContext))!;
 
-            if (context!.Designers.Any(e => e.Equals(value))) return new ValidationResult(GetErrorMessage(inputValue));
+            if (context!.Users.Any(e => e.Equals(value))) return new ValidationResult(GetErrorMessage(inputValue));
 
             return ValidationResult.Success;
         }

@@ -31,11 +31,11 @@ namespace TenApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<InboxDto>> Inbox()
         {
-            string key = $"Inbox_user_{int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value)}";
+            string key = $"Inbox_user_{Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value)}";
             InboxDto? userInbox = await _cache.GetRecordAsync<InboxDto>(key);
                 if (userInbox is null)
                 {
-                        userInbox = await _inboxRepository.GetInbox(int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
+                        userInbox = await _inboxRepository.GetInbox(Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value));
                         await _cache.SetRecordAsync(key, userInbox);               
                 }         
             return View(userInbox);
@@ -44,7 +44,7 @@ namespace TenApplication.Controllers
         [HttpPost]
         [IdProvidedValidation(IdName = "inboxItemId")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult<InboxItem>> UpdateInboxItem([FromForm] UpdateInboxItemDto updateInboxItemDto,int inboxItemId,DateTime entryDate)
+        public async Task<ActionResult<InboxItem>> UpdateInboxItem([FromForm] UpdateInboxItemDto updateInboxItemDto,Guid inboxItemId,DateTime entryDate)
         {       
             var authenticatedId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
 
@@ -54,7 +54,7 @@ namespace TenApplication.Controllers
 
         [HttpDelete]
         [IdProvidedValidation(IdName = "inboxItemId")]
-        public async Task<ActionResult<bool>> DeleteInboxItem([FromRoute] int inboxItemId)
+        public async Task<ActionResult<bool>> DeleteInboxItem([FromRoute] Guid inboxItemId)
         {
             await _inboxRepository.DeleteInboxItem(inboxItemId);
 

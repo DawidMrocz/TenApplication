@@ -5,7 +5,7 @@ namespace TenApplication.Dtos.RaportDTOModels
 {
     public class RaportRecordDto
     {
-        public int RaportRecordId { get; set; }
+        public Guid RaportRecordId { get; set; }
         public DateTime RaportCreateDate { get; set; }
         public double RaportRecordHours { get; set; }
         public int Components { get; set; }
@@ -13,15 +13,7 @@ namespace TenApplication.Dtos.RaportDTOModels
         public int DrawingsAssembly { get; set; }
 
         //RELATIONS
-        public string? Name { get; set; }
-        public string? Surname { get; set; }
-        public string DisplayName
-        {
-            get
-            {
-                return $"{Name} {Surname}";
-            }
-        }      
+        public string? UserName { get; set; } 
         
         public Software Software { get; set; }
         public int Ecm { get; set; }

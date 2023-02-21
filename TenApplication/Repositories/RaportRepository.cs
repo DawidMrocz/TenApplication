@@ -23,7 +23,7 @@ namespace TenApplication.Repositories
             return raport;
         }
 
-        public async Task<RaportDto> GetById(int raportId)
+        public async Task<RaportDto> GetById(Guid raportId)
         {
             RaportDto? raport = await _applicationDbContext.Raports
                 .AsSingleQuery()
@@ -34,12 +34,12 @@ namespace TenApplication.Repositories
                 .Include(rec => rec.RaportRecords)
                     .ThenInclude(i => i.InboxItem)
                         .ThenInclude(i => i.Inbox)
-                            .ThenInclude(d => d.Designer)
+                            .ThenInclude(d => d.User)
                 .Select(r => new RaportDto()
                 {
                     RaportDate = r.RaportDate,
                     RaportHours= r.RaportRecords.Sum(h => h.RaportRecordHours),
-                    UserRaportHours = r.RaportRecords.GroupBy(c => c.InboxItem.Inbox!.Designer.Name).Select(grp => new UserRaportHours()
+                    UserRaportHours = r.RaportRecords.GroupBy(c => c.InboxItem.Inbox!.User.UserName).Select(grp => new UserRaportHours()
                     {
                         UserName = grp.Key,
                         UserHours = grp.Sum(r => r.RaportRecordHours)
@@ -55,8 +55,7 @@ namespace TenApplication.Repositories
                             Components = r.InboxItem.Components,
                             DrawingsComponents = r.InboxItem.DrawingsComponents,
                             DrawingsAssembly = r.InboxItem.DrawingsAssembly,
-                            Name = r.InboxItem.Inbox!.Designer.Name,
-                            Surname = r.InboxItem.Inbox.Designer.Surname,
+                            UserName = r.InboxItem.Inbox!.User.UserName,
                             Software = r.InboxItem.Job!.Software,
                             Ecm = r.InboxItem.Job.Ecm,
                             Gpdm = r.InboxItem.Job.Gpdm,
@@ -65,7 +64,7 @@ namespace TenApplication.Repositories
                             DueDate = r.InboxItem.Job.DueDate,
                             Started = r.InboxItem.Job.Started,
                             Finished = r.InboxItem.Job.Finished
-                        }).OrderBy(d => d.Name).ThenBy(d => d.Started).ToList()
+                        }).OrderBy(d => d.UserName).ThenBy(d => d.Started).ToList()
                     }).ToList()
                 }).FirstOrDefaultAsync(r => r.RaportId == raportId);
 

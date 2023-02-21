@@ -5,7 +5,7 @@ namespace TenApplication.Dtos.InboxDTO
 {
     public class InboxItemDto
     {
-        public int InboxItemId { get; set; }
+        public Guid InboxItemId { get; set; }
         public double Hours { get; set; } 
         public int Components { get; set; }
         public int DrawingsComponents { get; set; }
