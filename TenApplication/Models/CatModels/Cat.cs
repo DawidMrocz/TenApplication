@@ -11,8 +11,8 @@ namespace TenApplication.Models
         public DateTime CatDate { get; set; }
 
         //RELATIONS
-        public Guid UserId { get; set; }
-        public User User { get; set; } = null!;
-        public List<CatRecord> CatRecords { get; set; } = new List<CatRecord>();
+        public Guid? UserId { get; set; }
+        public User? User { get; set; }
+        public List<CatRecord>? CatRecords { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using TenApplication.Dtos;
 using TenApplication.Dtos.DesignerDTOModels;
 using TenApplication.Models;
+using TenApplication.ActionFilters;
 
 namespace TenApplication.Controllers
 {
@@ -14,10 +15,12 @@ namespace TenApplication.Controllers
     public class UserController : Controller
     {
         private readonly IUserRepository _UserRepository;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserRepository UserRepository)
+        public UserController(IUserRepository UserRepository, ILogger<UserController> logger)
         {
             _UserRepository = UserRepository ?? throw new ArgumentNullException(nameof(UserRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
@@ -34,11 +37,35 @@ namespace TenApplication.Controllers
             }
         }
 
-        [Route("Logout")]
-        public async Task<ActionResult<bool>> Logout([FromForm] LoginDto command)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidationFilter(DTOName = "model")]
+        public async Task<IActionResult> Register([FromBody][Bind(include: "UserName,Email,Phone,Password,CCtr,ActTyp,ProfilePhoto")] RegisterDto model)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                await _UserRepository.CreateUser(model);
+                return RedirectToAction("Login", "Access");
+            }
+            catch
+            {
+                _logger.LogInformation("Process not succeed!");
+                return View();
+            }
+        }
+
+        public async Task<ActionResult<bool>> Logout()
+        {
+            try
+            {
+                await _UserRepository.LogOut();
+                return RedirectToAction("Login", "Access");
+            }
+            catch
+            {
+                _logger.LogInformation("Process not succeed!");
+                return View();
+            }
         }
 
         [HttpDelete]

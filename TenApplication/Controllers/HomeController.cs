@@ -75,6 +75,7 @@ namespace TenApplication.Controllers
         }
 
         [HttpPost(Name = "Create")]
+        [ValidateAntiForgeryToken]
         [ValidationFilter(DTOName = "job")]
         public async Task<IActionResult> Create([FromBody][Bind(include: "Name,Surname,BirthDate,Gender,CarLicense")] Job job)
         {

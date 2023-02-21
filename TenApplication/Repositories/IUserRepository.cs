@@ -10,7 +10,8 @@ namespace TenApplication.Repositories
         public Task<List<UserDto>> GetUsers();
         public Task<UserDto> GetProfile(Guid UserId);
 
-        public Task<bool> LoginUser(LoginDto command);
+        public Task<bool> LogIn(LoginDto command);
+        public Task<bool> LoginOut();
         public Task<bool> ForgotPassword(string UserEmail);
         public Task<bool> ChangePassword(Guid UserId, string oldPassword, string newPassword, string newPasswordRepeat);
         public Task<bool> ChangeRole(Guid UserId, UserRole role);
