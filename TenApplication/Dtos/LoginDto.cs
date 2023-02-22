@@ -4,6 +4,6 @@
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
-        public bool KeepLoggedIn { get; set; } = false;
+        public bool RememberMe { get; set; } = false;
     }
 }

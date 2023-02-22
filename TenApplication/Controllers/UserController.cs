@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TenApplication.Repositories;
 using System.Security.Claims;
@@ -61,14 +59,45 @@ namespace TenApplication.Controllers
                 await _UserRepository.LogOut();
                 return RedirectToAction("Login", "Access");
             }
-            catch
+            catch (Exception ex)
             {
-                _logger.LogInformation("Process not succeed!");
+                _logger.LogInformation("Process not succeed!", ex);
                 return View();
             }
         }
 
-        [HttpDelete]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidationFilter(DTOName = "model")]
+        public async Task<ActionResult<bool>> LogIn([FromBody][Bind(include: "Email,Password,RememberMe")] LoginDto model)
+        {       
+            try
+            {
+                string result = await _UserRepository.LogIn(model);
+                switch (result)
+                {
+                    case "Success":
+                        _logger.LogWarning("User account locked out.");
+                        return RedirectToAction("Index", "Home");
+
+                    case "Lockout":
+                        _logger.LogWarning("User account locked out.");
+                        return RedirectToAction("./Lockout");
+
+                    case "Invalid_attempt":
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return View();
+                }
+                return RedirectToAction("Login", "Access");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation("Process not succeed!",ex);
+                return View();
+            }
+        }
+
+        [HttpPost]
         public async Task<ActionResult<bool>> DeleteUser()
         {
             try
@@ -78,22 +107,26 @@ namespace TenApplication.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogInformation("Process not succeed!", ex);
+                return View();
             }
         }
 
-        [HttpPut]
-        public async Task<ActionResult<User>> UpdateUser([FromBody] UpdateDto updateUser, [FromRoute]Guid userId)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ValidationFilter(DTOName = "model")]
+        public async Task<ActionResult<User>> UpdateUser([FromBody][Bind(include: "UserName,Phone,CCtr,ActTyp,ProfilePhoto")] UpdateDto model)
         {
-            var UserId = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            Guid userId = Guid.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
             try
             {
-                User newUser = await _UserRepository.UpdateUser(updateUser,userId);
+                User newUser = await _UserRepository.UpdateUser(model,userId);
                 return Ok(newUser);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogInformation("Process not succeed!", ex);
+                return View();
             }
         }
     }

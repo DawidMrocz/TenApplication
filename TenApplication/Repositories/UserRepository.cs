@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using System.Security.Claims;
 using TenApplication.Data;
 using TenApplication.Dtos;
 using TenApplication.Dtos.DesignerDTOModels;
@@ -56,21 +57,19 @@ namespace TenApplication.Repositories
             UserDto? profile = await _cache.GetRecordAsync<UserDto>($"Profile_{userId}");
             if (profile is null)
             {
-                //User? user = await _userManager.FindByIdAsync(userId)
-;
-                //profile = await _context.Users
-                //    .AsNoTracking()
-                //    .Select(d => new UserDto()
-                //    {
-                //        UserId = d.Id,
-                //        UserName = d.UserName,
-                //        Email = d.Email,
-                //        CCtr = d.CCtr,
-                //        ActTyp = d.ActTyp,
-                //       // UserRole = d.UserRole,
-                //        Level = d.Level,
-                //        TennecoStartDate = d.TennecoStartDate
-                //    }).SingleAsync(p => p.UserRole == userId);
+
+                profile = await _context.Users
+                    .AsNoTracking()
+                    .Select(d => new UserDto()
+                    {
+                        Id = d.Id,
+                        UserName = d.UserName,
+                        Email = d.Email,
+                        CCtr = d.CCtr,
+                        ActTyp = d.ActTyp,
+                        Level = d.Level,
+                        TennecoStartDate = d.TennecoStartDate
+                    }).SingleAsync(p => p.Id == userId);
 
                 if (profile is null) throw new BadHttpRequestException("Profile do not exist!");
 
@@ -79,71 +78,111 @@ namespace TenApplication.Repositories
             return profile;
         }
 
-        public async Task<User> CreateUser(RegisterDto command)
+        public async Task<bool> CreateUser(RegisterDto model)
         {
-            User newUser = new User()
-            {
-                UserName = command.UserName,
-                Email = command.Email,
-                ActTyp = command.ActTyp,
-                CCtr = command.CCtr,
-               // UserRole = UserRole.User,
-                Level = Level.Associative_Engineer,
-                TennecoStartDate = DateTime.Now
-            };
 
-            Inbox newInbox = new()
-            {
-                UserId = newUser.Id,
-                InboxItems = new List<InboxItem>()
-            };
+            User? userExist = await _userManager.FindByEmailAsync(model.Email);
 
-            if (command.ProfilePhoto is not null)
+            if (userExist is not null)
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    if (memoryStream.Length < 2097152)
-                    {
-                        await command.ProfilePhoto.CopyToAsync(memoryStream);
-                        newUser.Photo = memoryStream.ToArray();
-                    }
-                }
+                _logger.LogInformation("Email already used!");
+                throw new BadHttpRequestException("User already exist!");
             }
 
-           // newUser.PasswordHash = _passwordHasher.HashPassword(newUser, command.Password);
-            await _context.Users.AddAsync(newUser);
-            await _context.Inboxs.AddAsync(newInbox);
-            await _context.SaveChangesAsync();
-            return newUser;
+                User newUser = new User()
+                {
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    ActTyp = model.ActTyp,
+                    CCtr = model.CCtr,
+                    Level = Level.Associative_Engineer,
+                    TennecoStartDate = DateTime.Now
+                };
+
+                IdentityResult result = await _userManager.CreateAsync(newUser, model.Password);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User created a new account with password.");
+                    if (!await _roleManager.RoleExistsAsync("User"))
+                    {
+                        await _roleManager.CreateAsync(new ApplicationRole("User"));
+                    }
+
+                    await _userManager.AddToRoleAsync(newUser, "User");
+
+                    Inbox newInbox = new()
+                    {
+                        UserId = newUser.Id,
+                        InboxItems = new List<InboxItem>()
+                    };
+
+                    if (model.ProfilePhoto is not null)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            if (memoryStream.Length < 2097152)
+                            {
+                                await model.ProfilePhoto.CopyToAsync(memoryStream);
+                                newUser.Photo = memoryStream.ToArray();
+                            }
+                        }
+                    }
+
+                    await _context.Inboxs.AddAsync(newInbox);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    throw new BadHttpRequestException("Sth went wrong!");
+                }      
         }
 
-        public async Task<bool> LoginUser(LoginDto command)
+        public async Task<string> LogIn(LoginDto model)
         {
-            var User = await _context.Users.FirstOrDefaultAsync(u => u.Email == command.Email);
 
-            if (User is null) throw new BadHttpRequestException("Bad");
+            User? user = await _userManager.FindByEmailAsync(model.Email);
 
-            //var result = _passwordHasher.VerifyHashedPassword(User, User.PasswordHash!, command.Password);
+            if (user is null) throw new BadHttpRequestException("User not found!");
 
-            //if (result == PasswordVerificationResult.Failed) throw new BadHttpRequestException("Bad");
+            bool checkPassword = await _userManager.CheckPasswordAsync(user, model.Password);
 
-            //List<Claim> claims = new List<Claim>()
-            //            {
-            //                new Claim(ClaimTypes.NameIdentifier,User.UserId.ToString()),
-            //                new Claim(ClaimTypes.Name,User.Name),
-            //                new Claim(ClaimTypes.Role,User.UserRole.ToString()),
-            //            };
-            //ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!checkPassword) throw new BadHttpRequestException("User not found!");
 
-            //AuthenticationProperties properties = new AuthenticationProperties()
-            //{
-            //    AllowRefresh = true,
-            //    IsPersistent = command.KeepLoggedIn
-            //};
-            //await _httpContextAccessor.HttpContext!.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-            //    new ClaimsPrincipal(claimsIdentity), properties);
+            var result = await _signInManager.PasswordSignInAsync(user.UserName,
+                               model.Password, model.RememberMe, lockoutOnFailure: true);
 
-            return true;
+            if (result.Succeeded)
+            {
+                IList<string> userRoles = await _userManager.GetRolesAsync(user);
+
+                var authClaims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+                        new Claim("CCtr",user.CCtr),
+                        new Claim("ActTyp",user.ActTyp),
+                        new Claim(ClaimTypes.Name,user.UserName)
+                    };
+
+                //if (user.Gender == "Man") await _userManager.AddClaimAsync(user, new Claim("Gender", user.Gender));
+
+                foreach (string userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }               
+                return "Success";
+            }
+
+            if (result.IsLockedOut) return "Lockout";
+
+             return "Invalid_attempt";
+        }
+
+        public async Task LogOut()
+        {
+            await _signInManager.SignOutAsync();
         }
 
         public async Task<bool> DeleteUser(Guid UserId)

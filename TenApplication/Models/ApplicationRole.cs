@@ -9,7 +9,11 @@ namespace TenApplication.Models
         Admin,
     }
     public class ApplicationRole : IdentityRole<Guid>
-    {       
+    {
+        public ApplicationRole(string roleName) : base(roleName)
+        {
+        }
+
         public UserRole UserRole { get; set; }
     }
 }
